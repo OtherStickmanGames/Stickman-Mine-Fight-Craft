@@ -26,6 +26,7 @@ public class Generator : MonoBehaviour
 
     [SerializeField] float thresoldMain = 0.35f;
     [SerializeField] bool useOptimization;
+    [SerializeField] public StartVillageData startVillageData;
 
     [Header("Îé Áëÿÿÿ...")]
     [SerializeField] Sprite spirt;

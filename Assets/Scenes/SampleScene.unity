@@ -2346,6 +2346,7 @@ MonoBehaviour:
   chunckViewDistance: 3
   thresoldMain: 0.35
   useOptimization: 1
+  startVillageData: {fileID: 11400000, guid: b39005e36349d8b4883cfacb7753bbcd, type: 2}
   spirt: {fileID: -636006465, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
   playerStartPos: {x: 0, y: 0}
   player: {fileID: 0}

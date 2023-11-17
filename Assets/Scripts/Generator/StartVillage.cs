@@ -49,7 +49,11 @@ public class StartVillage
 
         Debug.Log($"Убаный шашлык {yStartOffset}");
 
-        CreateBuilding();
+        foreach (var item in generator.startVillageData.buildings)
+        {
+            CreateBuilding(item.tilesData.name, item.leftPos);
+        }
+        
     }
 
     void FindPlacePositions()
@@ -72,9 +76,9 @@ public class StartVillage
         }
     }
 
-    void CreateBuilding()
+    void CreateBuilding(string buildName, int posX)
     {
-        var json = Resources.Load("Opto")?.ToString();
+        var json = Resources.Load(buildName)?.ToString();
         if (json == null)
             return;
 
@@ -94,7 +98,7 @@ public class StartVillage
         foreach (var item in obaniy)
         {
             var setTile = true;
-            var pos = startPos - new Vector2(8, 0) + item.pos;
+            var pos = startPos - new Vector2(posX, 0) + item.pos;
             var chunck = generator.GetChunck(pos);
             var tilemap = item.layer == 1 ? chunck.Tilemap : chunck.TilemapBack;
             var cellPos = tilemap.WorldToCell(pos);
