@@ -78,15 +78,12 @@ public class BuildingTemplateSaver : MonoBehaviour
 
                 var chunck = generator.GetChunck(pos);
 
-                var tilemap = chunck.Tilemap;
+                var tilemap = chunck.CurTilemap;
 
                 if (Layer.Inst.CurLayer != 1 && Layer.Inst.CurLayer != 2)
                     Debug.Log("!!! 团屡型凵 阉紊 !!! 帕劳镭世!!!");
 
-                if (Layer.Inst.CurLayer == 2)
-                {
-                    tilemap = chunck.TilemapBack;
-                }
+                
 
                 var tilePos = tilemap.WorldToCell(pos);
 
@@ -156,7 +153,7 @@ public class BuildingTemplateSaver : MonoBehaviour
             var setTile = true;
             var pos = startPos + item.pos;
             var chunck = generator.GetChunck(pos);
-            var tilemap = item.layer == 1 ? chunck.Tilemap : chunck.TilemapBack;
+            var tilemap = chunck.CurTilemap;
             var cellPos = tilemap.WorldToCell(pos);
             var color = item.isBack ? Layer.Inst.colorBackSide : Color.white;
             var colliderType = Tile.ColliderType.None;

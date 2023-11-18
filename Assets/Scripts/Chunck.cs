@@ -6,8 +6,8 @@ using UnityEngine.Tilemaps;
 public class Chunck : MonoBehaviour
 {
     [SerializeField] Tilemap tilemap;
+    [SerializeField] Tilemap tilemapMiddle;
     [SerializeField] Tilemap tilemapBack;
-    [SerializeField] Tilemap layer3;
     [SerializeField] new TilemapCollider2D collider;
 
     public List<Vector2Int> backTiles = new();
@@ -15,8 +15,30 @@ public class Chunck : MonoBehaviour
 
     public Tilemap Tilemap => tilemap;
     public Tilemap TilemapBack => tilemapBack;
-    public Tilemap Tilemap3 => layer3;
+    public Tilemap TilemapMiddle => tilemapMiddle;
     public TilemapCollider2D Collider => collider;
+
+    public Tilemap CurTilemap
+    {
+        get 
+        {
+            if(Layer.Inst.CurLayer == 1)
+            {
+                return tilemap;
+            }
+            else
+            {
+                if (Miner.Instance.backMine)
+                {
+                    return tilemapBack;
+                }
+                else
+                {
+                    return tilemapMiddle;
+                }
+            }
+        }
+    }
 
     public int Distance(Vector2 playerPos)
     {
