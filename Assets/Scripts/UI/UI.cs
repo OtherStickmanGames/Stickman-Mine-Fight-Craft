@@ -15,6 +15,7 @@ public class UI : MonoBehaviour
     [Space(8)]
 
     [SerializeField] LayerSwitcher layerSwitcher;
+    [SerializeField] TilesPalette tilesPalette;
 
     public HUD hud;
     public PlayerInput playerInput;
@@ -23,12 +24,21 @@ public class UI : MonoBehaviour
     {
         EventsHolder.playerSpawnedMine.AddListener(Player_Spawned);
         EventsHolder.onMineModeSwitch.AddListener(MineMode_Switched);
+        EventsHolder.onBuildEditorMode.AddListener(BuildEditorState_Changed);
 
         btnMineMode.onClick.AddListener(MineMode_Clicked);
 
         MineMode_Switched(false);
 
         layerSwitcher.Init();
+        tilesPalette.Init();
+
+        BuildEditorState_Changed(false);
+    }
+
+    private void BuildEditorState_Changed(bool enabled)
+    {
+        tilesPalette.gameObject.SetActive(enabled);
     }
 
     private void MineMode_Clicked()

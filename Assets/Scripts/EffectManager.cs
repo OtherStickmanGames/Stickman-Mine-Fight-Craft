@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class EffectManager : MonoBehaviour
 {
@@ -10,10 +11,13 @@ public class EffectManager : MonoBehaviour
     [SerializeField] GameObject mineEffectPrefab;
 
     static EffectManager Inst;
+    static Generator generator;
 
     private void Awake()
     {
         Inst = this;
+
+        generator = GetComponent<Generator>();
     }
 
     public static void PunchEffect(Vector3 pos)
@@ -43,21 +47,30 @@ public class EffectManager : MonoBehaviour
         var uv = mineable.tile.sprite.uv;
         var newTexture = new Texture2D(64, 64);
 
-        int startX = (int)(uv[0].x * 1024);
-        int endX = (int)(uv[1].x * 1024);
-        int startY = (int)(uv[3].y * 1024);
-        int endY = (int)(uv[0].y * 1024);
-
-        for (int x = startX; x < endX; x++)
+        //var b = generator.BlocksData.ToList().Find(b => b.sprite.texture == mineable.tile.sprite.texture);
+        if (mineable.tile.sprite.name.IndexOf("terrain") < 0)
         {
-            for (int y = startY; y < endY; y++)
-            {
-                var pixel = mineable.tile.sprite.texture.GetPixel(x, y);
-                newTexture.SetPixel(x - startX, y - startY, pixel);
-                
-            }
+            newTexture = mineable.tile.sprite.texture;
         }
-        newTexture.Apply();
+        else
+        {
+            int startX = (int)(uv[0].x * 1024);
+            int endX = (int)(uv[1].x * 1024);
+            int startY = (int)(uv[3].y * 1024);
+            int endY = (int)(uv[0].y * 1024);
+
+            for (int x = startX; x < endX; x++)
+            {
+                for (int y = startY; y < endY; y++)
+                {
+                    var pixel = mineable.tile.sprite.texture.GetPixel(x, y);
+                    newTexture.SetPixel(x - startX, y - startY, pixel);
+
+                }
+            }
+            newTexture.Apply();
+        }
+
         mat.mainTexture = newTexture;
 
         renderer.material = mat;

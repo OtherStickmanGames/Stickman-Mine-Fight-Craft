@@ -84,7 +84,7 @@ public class StartVillage
 
         var obaniy = JsonUtility.FromJson<BuildingTemplateSaver.Ebososka>(json).data;
 
-        Debug.Log(obaniy.Count);
+        //Debug.Log(obaniy.Count);
 
         var startPos = generator.playerStartPos;
         startPos.y += yStartOffset + 1;
@@ -107,8 +107,7 @@ public class StartVillage
 
             if (item.layer == 1 && !item.isBack)
                 colliderType = Tile.ColliderType.Sprite;
-            if (item.ID == 6)
-                Debug.Log($"{item.isBack}");
+            
             //Debug.Log($"|{c}| = {curCheckPos} = {cellPos} = {chunck.gameObject}");
             Tile tile = new()
             {

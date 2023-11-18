@@ -173,9 +173,14 @@ public class EventsHolder
 
     //========================= UI ============================
 
-    //public class CardWeaponUpdate : UnityEvent<User.Weapon> { }
+    public class TileViewClick : UnityEvent<int> { }
 
-    //public static CardWeaponUpdate onCardWeaponUpdate = new();
+    public static TileViewClick onTileViewClick = new();
+
+    //-----------------------------------------------------------------------
+    public class BuildEditorMode : UnityEvent<bool> { }
+
+    public static BuildEditorMode onBuildEditorMode = new();
 
     //-----------------------------------------------------------------------
 

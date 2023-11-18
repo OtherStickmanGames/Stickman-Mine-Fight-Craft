@@ -161,6 +161,7 @@
     <Compile Include="Assets\LeanTween\Testing\Testing240.cs" />
     <Compile Include="Assets\YandexGame\Example\ExampleScripts\NewResultLeaderboard.cs" />
     <Compile Include="Assets\LeanTween\Testing\Scripts\LeanPool.cs" />
+    <Compile Include="Assets\Scripts\UI\Build Editor\TileView.cs" />
     <Compile Include="Assets\Scripts\Utils\Json.cs" />
     <Compile Include="Assets\LeanTween\Testing\PerformanceTests.cs" />
     <Compile Include="Assets\TwoTVGames\DayNightSystem2D\Scripts\DayNightSystem2D.cs" />
@@ -176,6 +177,7 @@
     <Compile Include="Assets\YandexGame\Example\ExampleScripts\OpenAuthorizationDialog.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\TestingZLegacyExt.cs" />
     <Compile Include="Assets\Scripts\PlayerBehaviour.cs" />
+    <Compile Include="Assets\Scripts\UI\Build Editor\TilesPalette.cs" />
     <Compile Include="Assets\YandexGame\ScriptsYG\GraphicSettingsYG.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\PathSpline2d.cs" />
     <Compile Include="Assets\LeanTween\Framework\LTSeq.cs" />

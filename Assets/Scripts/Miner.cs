@@ -277,6 +277,8 @@ public class Mineable
     public Vector3 blockGlobalPos;
     public Vector3Int blockTilePos;
     public float distance;
+    // Для тайлов без атласа
+    public Sprite sprite;
 }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.IO;
+using UnityEngine.EventSystems;
 
 public class BuildingTemplateSaver : MonoBehaviour
 {
@@ -13,11 +14,21 @@ public class BuildingTemplateSaver : MonoBehaviour
     [SerializeField]
     List<BlockData> blocks = new();
 
-    int curIdxBlock = 0;
+    int curIdxBlock = -1;
 
     public class Ebososka
     {
         public List<BlockData> data;
+    }
+
+    private void Start()
+    {
+        EventsHolder.onTileViewClick.AddListener(TileView_Clicked);
+    }
+
+    private void TileView_Clicked(int tileID)
+    {
+        curIdxBlock = tileID;
     }
 
     void Update()
@@ -32,9 +43,13 @@ public class BuildingTemplateSaver : MonoBehaviour
         {
             saverModeOn = !saverModeOn;
             if (saverModeOn)
-                print($"Ну, епта, запись пошла..");
+            {
+                EventsHolder.onBuildEditorMode?.Invoke(true);
+            }
             else
             {
+                EventsHolder.onBuildEditorMode?.Invoke(false);
+
                 if (blocks.Count > 0)
                 {
                     PrepareBlocksData();
@@ -55,7 +70,7 @@ public class BuildingTemplateSaver : MonoBehaviour
         {
             InputChooseBlock();
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !ClickOnUI())
             {
                 var layer = Layer.Inst.CurLayer;
                 var backSide = Miner.Instance.backMine;
@@ -258,6 +273,22 @@ public class BuildingTemplateSaver : MonoBehaviour
         {
             curIdxBlock = -1;
         }
+    }
+
+    private bool ClickOnUI()
+    {
+        var es = EventSystem.current;
+        var ped = new PointerEventData(es) { position = Input.mousePosition };
+        var raycastResult = new List<RaycastResult>();
+        es.RaycastAll(ped, raycastResult);
+
+        foreach (var item in raycastResult)
+        {
+            if (item.gameObject.layer == 5)
+                return true;
+        }
+
+        return false;
     }
 
     [System.Serializable]
