@@ -93,8 +93,6 @@ public class StartVillage
         List<Vector2?> reservedTilesBackLayers = new();// о тайлах, которые не нужно
                                                       // перекрывать тайлом, который находится
                                                       // на той же позиции, но сзади
-
-
         foreach (var item in obaniy)
         {
             var setTile = true;

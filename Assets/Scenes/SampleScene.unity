@@ -2904,6 +2904,8 @@ MonoBehaviour:
   - sprite: {fileID: -978083770, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
   - sprite: {fileID: 21300000, guid: d73abbcd599cbed47acdb30ce7ef4ce3, type: 3}
   - sprite: {fileID: 21300000, guid: 4fe3f3ec1023dae40a7790934f772bfd, type: 3}
+  - sprite: {fileID: 21300000, guid: 4028e7eb165fe0b4bb074f163a0804e0, type: 3}
+  - sprite: {fileID: 1792703646, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
   useRandomSeed: 0
   globalZoom: 333
   globalCutout: 888
@@ -3809,11 +3811,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8170153791668043268, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 726.607
+      value: 554.239
       objectReference: {fileID: 0}
     - target: {fileID: 8170153791668043268, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 526.826
+      value: 426.791
       objectReference: {fileID: 0}
     - target: {fileID: 8170153791668043268, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
       propertyPath: m_LocalPosition.x

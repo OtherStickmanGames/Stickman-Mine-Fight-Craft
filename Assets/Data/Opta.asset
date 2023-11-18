@@ -19,3 +19,5 @@ MonoBehaviour:
     leftPos: -6
   - tilesData: {fileID: 4900000, guid: 33f71289a48db7a478eed4a75ea12ca9, type: 3}
     leftPos: 30
+  - tilesData: {fileID: 4900000, guid: 44dbe182c2bccd449b06059cc563802a, type: 3}
+    leftPos: 22
