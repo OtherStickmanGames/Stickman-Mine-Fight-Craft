@@ -7,12 +7,16 @@ public class GameInitialiazer : MonoBehaviour
 {
     public GameObject playerPrefab;
     public GameObject housePrefab;
+    public GameObject worldManagerPrefab;
 
     private void Start()
     {
         if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            var worldManager = Instantiate(worldManagerPrefab);
+            NetworkObject networkObject = worldManager.GetComponent<NetworkObject>();
+            networkObject.Spawn();
         }
     }
 
