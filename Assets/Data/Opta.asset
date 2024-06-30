@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Opta
   m_EditorClassIdentifier: 
   buildings:
-  - tilesData: {fileID: 4900000, guid: b844840bf0951b24ba3e4ab613735783, type: 3}
+  - tilesData: {fileID: 4900000, guid: 0e5d2dcdf6b82364eb0d1e562dc77d2f, type: 3}
     leftPos: 8
   - tilesData: {fileID: 4900000, guid: a8db4106ff853014b968963d656b7c6f, type: 3}
     leftPos: -6

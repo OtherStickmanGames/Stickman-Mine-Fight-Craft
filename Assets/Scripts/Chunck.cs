@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static BuildingTemplateSaver;
 
 public class Chunck : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class Chunck : MonoBehaviour
     public Tilemap TilemapBack => tilemapBack;
     public Tilemap TilemapMiddle => tilemapMiddle;
     public TilemapCollider2D Collider => collider;
+
+    Dictionary<Vector3Int, Interactable> interactableBlocks = new();
 
     public Tilemap CurTilemap
     {
@@ -36,6 +39,40 @@ public class Chunck : MonoBehaviour
                 {
                     return tilemapMiddle;
                 }
+            }
+        }
+    }
+
+    public void AddInteractBlock(Vector3Int tilePos, Interactable block)
+    {
+        //print((block as Block).Layer);
+        interactableBlocks.Add(tilePos, block);
+    }
+
+    private void Update()
+    {
+        foreach (var kvPair in interactableBlocks)
+        {
+            var block = kvPair.Value;
+            block.Interact();
+        }
+    }
+
+    public Tilemap GetTilemap(int layer, bool backSide)
+    {
+        if (layer == 1)
+        {
+            return tilemap;
+        }
+        else
+        {
+            if (backSide)
+            {
+                return tilemapBack;
+            }
+            else
+            {
+                return tilemapMiddle;
             }
         }
     }

@@ -98,7 +98,7 @@ public class StartVillage
             var setTile = true;
             var pos = startPos - new Vector2(posX, 0) + item.pos;
             var chunck = generator.GetChunck(pos);
-            var tilemap = item.layer == 1 ? chunck.Tilemap : chunck.TilemapBack;
+            var tilemap = chunck.GetTilemap(item.layer, item.isBack);
             var cellPos = tilemap.WorldToCell(pos);
             var color = item.isBack ? Layer.Inst.colorBackSide : Color.white;
             var colliderType = Tile.ColliderType.None;
@@ -130,21 +130,27 @@ public class StartVillage
                 }
             }
 
-            if (item.layer == 2)
-            {
-                if (!item.isBack)
-                {
-                    reservedTilesBackLayers.Add(pos);
-                }
-                else
-                {
-                    var t = reservedTilesBackLayers.Find(t => t.Value == pos);
-                    if (t != null)
-                    {
-                        setTile = false;
-                    }
-                }
-            }
+            //if (item.ID == 8)
+            //{
+            //    var block = new Door() { ID = item.ID, Layer = item.layer, BackSide = item.isBack };
+            //    chunck.AddInteractBlock(cellPos, block);
+            //}
+
+            //if (item.layer == 2)
+            //{
+            //    if (!item.isBack)
+            //    {
+            //        reservedTilesBackLayers.Add(pos);
+            //    }
+            //    else
+            //    {
+            //        var t = reservedTilesBackLayers.Find(t => t.Value == pos);
+            //        if (t != null)
+            //        {
+            //            setTile = false;
+            //        }
+            //    }
+            //}
 
             if (setTile)
             {

@@ -2896,16 +2896,27 @@ MonoBehaviour:
   playerPrefab: {fileID: 2350154923518311753, guid: 5fdc4b429499e5243a655582f6ad4df0, type: 3}
   chunckPrefab: {fileID: 8778228135878192995, guid: 8cd09c9ae637a5f4385fa372d47cb667, type: 3}
   blockData:
-  - sprite: {fileID: -172523171, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
-  - sprite: {fileID: -1518974828, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
-  - sprite: {fileID: 862813911, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
-  - sprite: {fileID: 178336150, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
-  - sprite: {fileID: -505962862, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
-  - sprite: {fileID: -978083770, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
-  - sprite: {fileID: 21300000, guid: d73abbcd599cbed47acdb30ce7ef4ce3, type: 3}
-  - sprite: {fileID: 21300000, guid: 4fe3f3ec1023dae40a7790934f772bfd, type: 3}
-  - sprite: {fileID: 21300000, guid: 4028e7eb165fe0b4bb074f163a0804e0, type: 3}
-  - sprite: {fileID: 1792703646, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: 
+    sprite: {fileID: -172523171, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: 
+    sprite: {fileID: -1518974828, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: 
+    sprite: {fileID: 862813911, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: 
+    sprite: {fileID: 178336150, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: 
+    sprite: {fileID: -505962862, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: 
+    sprite: {fileID: -978083770, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: 
+    sprite: {fileID: 21300000, guid: d73abbcd599cbed47acdb30ce7ef4ce3, type: 3}
+  - name: 
+    sprite: {fileID: 21300000, guid: 4fe3f3ec1023dae40a7790934f772bfd, type: 3}
+  - name: 
+    sprite: {fileID: 21300000, guid: 4028e7eb165fe0b4bb074f163a0804e0, type: 3}
+  - name: 
+    sprite: {fileID: 1792703646, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  doorSideClose: {fileID: 21300000, guid: 7a630e71a1350c84295c5f6be0dbdd1d, type: 3}
   useRandomSeed: 0
   globalZoom: 333
   globalCutout: 888

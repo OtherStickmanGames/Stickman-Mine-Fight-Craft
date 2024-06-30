@@ -10,6 +10,7 @@ public class Generator : MonoBehaviour
     [SerializeField] Player playerPrefab;
     [SerializeField] Chunck chunckPrefab;
     [SerializeField] BlockData[] blockData;
+    [SerializeField] public Sprite doorSideClose;
     [SerializeField] bool useRandomSeed;
     [Space]
     [SerializeField] float globalZoom = 188;
@@ -356,6 +357,7 @@ public class Generator : MonoBehaviour
     [System.Serializable]
     public class BlockData
     {
+        public string name;
         public Sprite sprite;
     }
 }
