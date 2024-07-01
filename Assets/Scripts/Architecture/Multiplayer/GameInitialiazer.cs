@@ -6,8 +6,11 @@ using UnityEngine;
 public class GameInitialiazer : MonoBehaviour
 {
     public GameObject playerPrefab;
-    public GameObject housePrefab;
     public GameObject worldManagerPrefab;
+    public GameObject villagePrefab;
+
+    private Dictionary<string, Vector3> playerStartingPositions = new Dictionary<string, Vector3>();
+
 
     private void Start()
     {
@@ -20,43 +23,52 @@ public class GameInitialiazer : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (!NetworkManager.Singleton)
+            return;
+
+        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+    }
+
     private void OnClientConnected(ulong clientId)
     {
-        GenerateVillageForClient(clientId);
-    }
-
-    private void GenerateVillageForClient(ulong clientId)
-    {
-        List<Vector3> spawnPoints = new List<Vector3>();
-
-        // ѕример генерации деревушки с домами и добавление точек спавна
-        for (int i = 0; i < 5; i++) // —оздадим 5 домов
+        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost)
         {
-            Vector3 housePosition = new Vector3((int)clientId * 100 + i * 10, 0, 0); // –асположим дома с промежутком в 10 единиц
-            Instantiate(housePrefab, housePosition, Quaternion.identity);
-            spawnPoints.Add(housePosition + new Vector3(2, 0, 0)); // ƒобавл€ем точку спавна р€дом с каждым домом
+            string clientIdString = clientId.ToString();
+            if (!playerStartingPositions.ContainsKey(clientIdString))
+            {
+                Vector3 villagePosition = GenerateVillageForNewPlayer();
+                playerStartingPositions[clientIdString] = villagePosition;
+            }
+
+            SpawnPlayer(clientId, playerStartingPositions[clientIdString]);
         }
-
-        SpawnPlayer(clientId, spawnPoints);
     }
 
-    private void SpawnPlayer(ulong clientId, List<Vector3> spawnPoints)
+
+    private Vector3 GenerateVillageForNewPlayer()
     {
-        Vector3 spawnPosition = GetRandomSpawnPoint(spawnPoints);
-        GameObject player = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
-        NetworkObject networkObject = player.GetComponent<NetworkObject>();
-        networkObject.SpawnAsPlayerObject(clientId);
+        GameObject village = Instantiate(villagePrefab);
+        return village.transform.position;
     }
 
-    private Vector3 GetRandomSpawnPoint(List<Vector3> spawnPoints)
+    public Vector3 GetStartingPosition(string clientId)
     {
-        if (spawnPoints.Count == 0)
+        if (playerStartingPositions.ContainsKey(clientId))
         {
-            Debug.LogError("No spawn points available in the village.");
-            return Vector3.zero;
+            return playerStartingPositions[clientId];
         }
+        return Vector3.zero;
+    }
 
-        int randomIndex = Random.Range(0, spawnPoints.Count);
-        return spawnPoints[randomIndex];
+
+    private void SpawnPlayer(ulong clientId, Vector3 position)
+    {
+        GameObject player = Instantiate(playerPrefab, position, Quaternion.identity);
+        player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
     }
 }
