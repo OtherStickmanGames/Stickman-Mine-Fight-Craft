@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1327773774420036472}
   - component: {fileID: 8518206843356640508}
+  - component: {fileID: 6711196347813437849}
   - component: {fileID: 7358179185857445451}
   m_Layer: 0
   m_Name: World Manager
@@ -48,6 +49,19 @@ MonoBehaviour:
   chunkPrefab: {fileID: 3712172722577698120, guid: dfbf43ae506809b418f031e6c8c2445b, type: 3}
   chunkSize: 16
   viewDistance: 3
+  syncDistanceThreshold: 50
+--- !u!114 &6711196347813437849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8367847032250825294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8528a97df486b848966f35841f9c0e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7358179185857445451
 MonoBehaviour:
   m_ObjectHideFlags: 0

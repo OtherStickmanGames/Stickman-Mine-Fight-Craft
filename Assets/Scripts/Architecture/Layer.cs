@@ -4,38 +4,70 @@ using UnityEngine;
 
 namespace Architecture
 {
+
     public class Layer
     {
-        private int chunkWidth;
-        private int chunkHeight;
+        private int chunkSize;
         private Dictionary<Vector2Int, Chunk> chunks;
 
-        public Layer(int chunkWidth, int chunkHeight)
+        public Layer(int chunkSize)
         {
-            this.chunkWidth = chunkWidth;
-            this.chunkHeight = chunkHeight;
+            this.chunkSize = chunkSize;
             chunks = new Dictionary<Vector2Int, Chunk>();
         }
 
-        public Chunk GetOrCreateChunk(int chunkX, int chunkY)
+        public bool HasChunk(Vector2Int chunkCoord)
         {
-            Vector2Int chunkPos = new Vector2Int(chunkX, chunkY);
-            if (!chunks.ContainsKey(chunkPos))
+            return chunks.ContainsKey(chunkCoord);
+        }
+
+        public void SetChunk(Vector2Int chunkCoord, Chunk chunk)
+        {
+            chunks[chunkCoord] = chunk;
+        }
+
+        public void SetBlock(Vector3Int position, bool isAdding)
+        {
+            Vector2Int chunkCoord = new Vector2Int(position.x / chunkSize, position.y / chunkSize);
+            if (chunks.ContainsKey(chunkCoord))
             {
-                chunks[chunkPos] = new Chunk(chunkWidth, chunkHeight);
+                chunks[chunkCoord].SetBlock(new Vector3Int(position.x % chunkSize, position.y % chunkSize, position.z), isAdding);
             }
-            return chunks[chunkPos];
         }
 
-        public Block GetBlock(int chunkX, int chunkY, int blockX, int blockY)
+        public bool GetBlock(Vector3Int position)
         {
-            return GetOrCreateChunk(chunkX, chunkY).GetBlock(blockX, blockY);
+            Vector2Int chunkCoord = new Vector2Int(position.x / chunkSize, position.y / chunkSize);
+            if (chunks.ContainsKey(chunkCoord))
+            {
+                return chunks[chunkCoord].GetBlock(new Vector3Int(position.x % chunkSize, position.y % chunkSize, position.z));
+            }
+            return false;
         }
 
-        public void SetBlock(int chunkX, int chunkY, int blockX, int blockY, Block block)
+        public Dictionary<Vector2Int, bool[,]> GetAllChunksState()
         {
-            GetOrCreateChunk(chunkX, chunkY).SetBlock(blockX, blockY, block);
+            Dictionary<Vector2Int, bool[,]> allChunksState = new Dictionary<Vector2Int, bool[,]>();
+            foreach (var chunk in chunks)
+            {
+                allChunksState[chunk.Key] = chunk.Value.GetBlocksState();
+            }
+            return allChunksState;
+        }
+
+        public void SetAllChunksState(Dictionary<Vector2Int, bool[,]> allChunksState)
+        {
+            foreach (var chunkState in allChunksState)
+            {
+                if (!chunks.ContainsKey(chunkState.Key))
+                {
+                    chunks[chunkState.Key] = new Chunk(chunkSize);
+                }
+                chunks[chunkState.Key].SetBlocksState(chunkState.Value);
+            }
         }
     }
+
+
 
 }

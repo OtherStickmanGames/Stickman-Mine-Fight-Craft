@@ -10,11 +10,11 @@ namespace Architecture
 
         private Vector3 lastPosition;
 
-        private GameInitialiazer gameManager;
+        private GameManager gameManager;
 
         public override void OnNetworkSpawn()
         {
-            gameManager = FindObjectOfType<GameInitialiazer>();
+            gameManager = FindObjectOfType<GameManager>();
 
             if (IsOwner)
             {
@@ -25,9 +25,9 @@ namespace Architecture
                 }
                 else
                 {
-                    Vector3 startingPosition = gameManager.GetStartingPosition(NetworkManager.Singleton.LocalClientId.ToString());
-                    transform.position = startingPosition;
-                    ClientIdentifier.SavePlayerPosition(startingPosition);
+                    //Vector3 startingPosition = gameManager.GetStartingPosition(NetworkManager.Singleton.LocalClientId.ToString());
+                    //transform.position = startingPosition;
+                    //ClientIdentifier.SavePlayerPosition(startingPosition);
                 }
 
                 // Add event listener for position changes
