@@ -14,7 +14,7 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
-        EventsHolder.playerSpawnedMine.AddListener(Plyer_Spawned);
+        Architecture.Player.onOwnerSpawn.AddListener(Plyer_Spawned);
         //EventsHolder.onCritPunch.AddListener(Crit_Punched);
         //EventsHolder.onBtnCamClicked.AddListener(Cam_Clicked);
         EventsHolder.onStickmanDestroyed.AddListener(CountCharacters_Changed);
@@ -60,9 +60,9 @@ public class CameraController : MonoBehaviour
         LeanTween.delayedCall(3f, () => cam.Follow = mainTarget);
     }
 
-    void Plyer_Spawned(Player target)
+    void Plyer_Spawned(Architecture.Player target)
     {
-        mainTarget = target.Hip;
-        cam.Follow = target.Hip;
+        mainTarget = target.transform;
+        cam.Follow = target.transform;
     }
 }

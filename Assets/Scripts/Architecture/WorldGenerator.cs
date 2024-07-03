@@ -5,6 +5,7 @@ using static BLOCKS;
 
 public class WorldGenerator : MonoBehaviour
 {
+    [SerializeField] public BlockData[] blocksData;
     [SerializeField] float thresoldMain = 0.35f;
     [SerializeField] bool useRandomSeed;
     [Space]
@@ -13,8 +14,6 @@ public class WorldGenerator : MonoBehaviour
     [Space]
     public int size = 10;
     public float zoom = 10;
-    public float k_1 = 10;
-    public bool useK;
 
     public static WorldGenerator Instance { get; private set; }
 
@@ -25,6 +24,8 @@ public class WorldGenerator : MonoBehaviour
 
     public static int GetBlockID(int posX, int posY)
     {
+        Random.InitState(888);
+
         int idBlock = EMPTY;
 
         var globalZoom = Instance.globalZoom;

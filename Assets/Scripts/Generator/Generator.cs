@@ -145,7 +145,7 @@ public class Generator : MonoBehaviour
             {
                 var idBlock = GetBlockID(x + posX, y + posY);
 
-                if (idBlock < 0)
+                if (idBlock == 0)
                     continue;
                 
                 var t = ScriptableObject.CreateInstance(typeof(Tile)) as Tile;
@@ -179,7 +179,7 @@ public class Generator : MonoBehaviour
                 }
                 if (idBlock == DIRT)// Проверка на верхний блок земли
                 {
-                    if(GetBlockID(posX, posY + 1) < 0)
+                    if(GetBlockID(posX, posY + 1) == 0)
                     {
                         idBlock = GROUND;
                     }

@@ -70,24 +70,24 @@ public class Variant_1 : NetworkBehaviour
         GameObject chunkObject = Instantiate(chunkPrefab);
         chunkObject.transform.position = new Vector3(chunkCoord.x * chunkSize, chunkCoord.y * worldHeight);
         Chunk chunk = chunkObject.GetComponent<Chunk>();
-        chunk.Initialize(chunkCoord);
+        chunk.Initialize(0, chunkCoord);
         return chunk;
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SetBlockServerRpc(Vector2Int chunkCoord, Vector2Int blockCoord, bool isAdding)
+    public void SetBlockServerRpc(Vector2Int chunkCoord, Vector2Int blockCoord, int blockId)
     {
         Chunk chunk = GetOrCreateChunk(chunkCoord);
-        chunk.SetBlock(blockCoord, isAdding);
+        chunk.SetBlock(blockCoord, blockId);
         SaveWorldState();
-        SetBlockClientRpc(chunkCoord, blockCoord, isAdding);
+        SetBlockClientRpc(chunkCoord, blockCoord, blockId);
     }
 
     [ClientRpc]
-    private void SetBlockClientRpc(Vector2Int chunkCoord, Vector2Int blockCoord, bool isAdding, ClientRpcParams clientRpcParams = default)
+    private void SetBlockClientRpc(Vector2Int chunkCoord, Vector2Int blockCoord, int blockId, ClientRpcParams clientRpcParams = default)
     {
         Chunk chunk = GetOrCreateChunk(chunkCoord);
-        chunk.SetBlock(blockCoord, isAdding);
+        chunk.SetBlock(blockCoord, blockId);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -132,13 +132,13 @@ public class Variant_1 : NetworkBehaviour
 
     public void SaveWorldState()
     {
-        Dictionary<Vector2Int, Dictionary<Vector2Int, bool>> worldState = new Dictionary<Vector2Int, Dictionary<Vector2Int, bool>>();
+        Dictionary<Vector2Int, Dictionary<Vector2Int, int>> worldState = new Dictionary<Vector2Int, Dictionary<Vector2Int, int>>();
         foreach (var chunk in chunks)
         {
             worldState[chunk.Key] = chunk.Value.GetAllBlocks();
         }
 
-        string json = JsonUtility.ToJson(new Serialization<Vector2Int, Dictionary<Vector2Int, bool>>(worldState));
+        string json = JsonUtility.ToJson(new Serialization<Vector2Int, Dictionary<Vector2Int, int>>(worldState));
         File.WriteAllText(saveFilePath, json);
     }
 
@@ -147,7 +147,7 @@ public class Variant_1 : NetworkBehaviour
         if (File.Exists(saveFilePath))
         {
             string json = File.ReadAllText(saveFilePath);
-            var worldState = JsonUtility.FromJson<Serialization<Vector2Int, Dictionary<Vector2Int, bool>>>(json).ToDictionary();
+            var worldState = JsonUtility.FromJson<Serialization<Vector2Int, Dictionary<Vector2Int, int>>>(json).ToDictionary();
 
             foreach (var chunk in worldState)
             {

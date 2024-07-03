@@ -69,7 +69,7 @@ namespace Architecture
 
         private void HandleMovement()
         {
-            float moveSpeed = 5f;
+            float moveSpeed = 15f;
             float moveHorizontal = Input.GetAxis("Horizontal");
             float moveVertical = Input.GetAxis("Vertical");
             //print(moveHorizontal);

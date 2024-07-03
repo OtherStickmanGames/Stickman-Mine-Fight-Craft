@@ -17,14 +17,14 @@ public class PlayerController : NetworkBehaviour
         {
             Vector2Int blockPosition = GetBlockPositionFromMouse();
             int layerIndex = 0; // Пример, используйте правильный индекс слоя
-            blockManager.SetBlock(layerIndex, blockPosition, true);
+            blockManager.SetBlock(layerIndex, blockPosition, 0);
         }
 
         if (IsOwner && Input.GetMouseButtonDown(1))
         {
             Vector2Int blockPosition = GetBlockPositionFromMouse();
             int layerIndex = 0; // Пример, используйте правильный индекс слоя
-            blockManager.SetBlock(layerIndex, blockPosition, false);
+            blockManager.SetBlock(layerIndex, blockPosition, 2);
         }
     }
 

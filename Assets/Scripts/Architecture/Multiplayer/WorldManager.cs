@@ -17,7 +17,7 @@ namespace Architecture
 
         private Dictionary<int, Dictionary<Vector2Int, Chunk>> layers = new Dictionary<int, Dictionary<Vector2Int, Chunk>>();
         private Dictionary<string, Vector3> playerPositions = new Dictionary<string, Vector3>();
-
+        Player player;
         private string saveFilePath;
 
         private void Awake()
@@ -55,7 +55,7 @@ namespace Architecture
 
         private void Owner_Spawned(Player owner)
         {
-            owner.OnPositionChanged += OnPlayerPositionChanged;
+            player = owner;
         }
 
         public override void OnNetworkSpawn()
@@ -83,9 +83,9 @@ namespace Architecture
         }
 
 
-        private void OnPlayerPositionChanged(Vector3 playerPosition)
+        private void CheckViewedChuncks()
         {
-            Debug.Log($"Player position changed: {playerPosition}");
+            var playerPosition = player.transform.position;
             Vector2Int currentChunkCoord = GetChunkCoordFromPosition(playerPosition);
 
             for (int xOffset = -viewDistance; xOffset <= viewDistance; xOffset++)
@@ -102,6 +102,8 @@ namespace Architecture
                             var chunk = GenerateChunk(i, chunkCoord);
                             chuncks[chunkCoord] = chunk;
                             //RequestChunkSpawnClientRpc(chunkCoord);
+
+                            return;
                         }
                     }
                 }
@@ -152,7 +154,7 @@ namespace Architecture
 
                         // Создаем новый чанк через префаб
                         Chunk chunk = Instantiate(chunkPrefab, Vector3.zero, Quaternion.identity);
-                        chunk.Initialize(chunkCoord);
+                        chunk.Initialize(layerIndex, chunkCoord);
 
                         // Заполняем чанк блоками
                         for (int x = 0; x < chunkSize; x++)
@@ -170,7 +172,7 @@ namespace Architecture
         }
 
 
-        public void SetBlock(int layer, Vector3Int globalPosition, bool isAdding)
+        public void SetBlock(int layer, Vector3Int globalPosition, int blockID)
         {
             Vector2Int chunkCoord = new Vector2Int(globalPosition.x / chunkSize, globalPosition.y / chunkSize);
             Vector2Int localPosition = new Vector2Int(globalPosition.x % chunkSize, globalPosition.y % chunkSize);
@@ -179,13 +181,13 @@ namespace Architecture
             {
                 if (layerChunks.TryGetValue(chunkCoord, out var chunk))
                 {
-                    chunk.SetBlock(localPosition, isAdding);
+                    chunk.SetBlock(localPosition, blockID);
                 }
                 else
                 {
                     // Чанк не найден, создаём новый чанк
                     chunk = CreateChunk(layer, chunkCoord);
-                    chunk.SetBlock(localPosition, isAdding);
+                    chunk.SetBlock(localPosition, blockID);
                 }
             }
             else
@@ -194,18 +196,18 @@ namespace Architecture
                 layerChunks = new Dictionary<Vector2Int, Chunk>();
                 layers[layer] = layerChunks;
                 var chunk = CreateChunk(layer, chunkCoord);
-                chunk.SetBlock(localPosition, isAdding);
+                chunk.SetBlock(localPosition, blockID);
             }
 
             // Синхронизация блока с другими клиентами
-            SyncBlock(layer, globalPosition, isAdding);
+            SyncBlock(layer, globalPosition, blockID);
         }
 
-        private void SyncBlock(int layer, Vector3Int globalPosition, bool isAdding)
+        private void SyncBlock(int layer, Vector3Int globalPosition, int blockID)
         {
             // Логика синхронизации блока с другими клиентами
             // Вызывается метод RPC для синхронизации блока
-            SetBlockClientRpc(layer, globalPosition, isAdding);
+            SetBlockClientRpc(layer, globalPosition, blockID);
         }
 
         private Chunk CreateChunk(int layer, Vector2Int chunkCoord)
@@ -213,12 +215,12 @@ namespace Architecture
             GameObject chunkObject = new GameObject($"Chunk_{chunkCoord.x}_{chunkCoord.y}_Layer_{layer}");
             chunkObject.transform.parent = transform;
             Chunk chunk = chunkObject.AddComponent<Chunk>();
-            chunk.Initialize(chunkCoord);
+            chunk.Initialize(layer, chunkCoord);
             layers[layer][chunkCoord] = chunk;
             return chunk;
         }
 
-        public bool GetBlock(int layer, Vector3Int globalPosition)
+        public int GetBlock(int layer, Vector3Int globalPosition)
         {
             Vector2Int chunkCoord = new Vector2Int(globalPosition.x / chunkSize, globalPosition.y / chunkSize);
             Vector2Int localPosition = new Vector2Int(globalPosition.x % chunkSize, globalPosition.y % chunkSize);
@@ -231,7 +233,7 @@ namespace Architecture
                 }
             }
 
-            return false;
+            return -1;
         }
 
         
@@ -260,12 +262,14 @@ namespace Architecture
             return chunk;
         }
 
-        private Chunk GenerateChunk(int layer, Vector2Int chunkCoord)
+        private Chunk GenerateChunk(int layer, Vector2Int chunkKey)
         {
             var chunk = Instantiate(chunkPrefab);
             chunk.name = $"Chunk-Layer:{layer}";
-            chunk.transform.position = new Vector3(chunkCoord.x * chunkSize, chunkCoord.y * chunkSize, layer);
-            chunk.Initialize(chunkCoord);
+            chunk.transform.position = new Vector3(chunkKey.x * chunkSize, chunkKey.y * chunkSize, layer);
+            var chunkPosition = new Vector2Int(chunkKey.x * chunkSize, chunkKey.y * chunkSize);
+            chunk.Initialize(layer, chunkPosition);
+            Debug.Log($"Chunck generated: {chunkKey}");
             return chunk;
         }
 
@@ -279,17 +283,17 @@ namespace Architecture
         }
 
         [ClientRpc]
-        private void SetBlockClientRpc(int layer, Vector3Int globalPosition, bool isAdding)
+        private void SetBlockClientRpc(int layer, Vector3Int globalPosition, int blockID)
         {
             if (IsServer) return;
-            SetBlock(layer, globalPosition, isAdding);
+            SetBlock(layer, globalPosition, blockID);
         }
 
         [ClientRpc]
-        private void SetBlockClientRpc(int layer, Vector2Int chunkCoord, Vector2Int blockCoord, bool isAdding)
+        private void SetBlockClientRpc(int layer, Vector2Int chunkCoord, Vector2Int blockCoord, int blockID)
         {
             Chunk chunk = GetOrCreateChunk(layer, chunkCoord);
-            chunk.SetBlock(blockCoord, isAdding);
+            chunk.SetBlock(blockCoord, blockID);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -385,9 +389,9 @@ namespace Architecture
 
         private void Update()
         {
-            if (IsServer)
+            if (player)
             {
-                CheckAndSyncChunks();
+                CheckViewedChuncks();
             }
         }
 
@@ -433,7 +437,7 @@ namespace Architecture
     public class ChunkData
     {
         public int x, y;
-        public bool[,] blocks;
+        public int[,] blocks;
 
         // Добавьте другие данные чанка, если необходимо
     }

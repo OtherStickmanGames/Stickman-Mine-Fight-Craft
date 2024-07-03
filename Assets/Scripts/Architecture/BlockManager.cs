@@ -19,44 +19,45 @@ public class BlockManager : NetworkBehaviour
     }
 
     // Method to handle block changes requested by the player
-    public void RequestBlockChange(int layer, Vector2Int position, bool isAdding)
+    public void RequestBlockChange(int layer, Vector2Int position, int blockID)
     {
         if (IsServer)
         {
             // If called on the server, directly update the block
-            SetBlock(layer, position, isAdding);
+            SetBlock(layer, position, blockID);
         }
         else
         {
             // If called on the client, send a request to the server
-            RequestBlockChangeServerRpc(layer, position, isAdding);
+            RequestBlockChangeServerRpc(layer, position, blockID);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestBlockChangeServerRpc(int layer, Vector2Int position, bool isAdding)
+    private void RequestBlockChangeServerRpc(int layer, Vector2Int position, int blockID)
     {
-        SetBlock(layer, position, isAdding);
+        SetBlock(layer, position, blockID);
     }
 
     // Method to set a block on the server and sync with clients
-    public void SetBlock(int layer, Vector2Int position, bool isAdding)
+    public void SetBlock(int layer, Vector2Int position, int blockID)
     {
         Chunk chunk = WorldManager.Instance.GetOrCreateChunk(layer, position);
         if (chunk != null)
         {
-            chunk.SetBlock(position, isAdding);
-            SyncBlockClientRpc(layer, position, isAdding);
+            chunk.SetBlock(position, blockID);
+            SyncBlockClientRpc(layer, position, blockID);
         }
+        print(position);
     }
 
     [ClientRpc]
-    private void SyncBlockClientRpc(int layer, Vector2Int position, bool isAdding)
+    private void SyncBlockClientRpc(int layer, Vector2Int position, int blockID)
     {
         Chunk chunk = WorldManager.Instance.GetOrCreateChunk(layer, position);
         if (chunk != null)
         {
-            chunk.SetBlock(position, isAdding);
+            chunk.SetBlock(position, blockID);
         }
     }
 
