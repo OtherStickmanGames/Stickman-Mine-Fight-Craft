@@ -10,7 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1327773774420036472}
   - component: {fileID: 8518206843356640508}
+  - component: {fileID: 6711196347813437849}
   - component: {fileID: 7358179185857445451}
+  - component: {fileID: 1742715074702858018}
   m_Layer: 0
   m_Name: World Manager
   m_TagString: Untagged
@@ -45,9 +47,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d416ba59b30e3ed4197611d54726a0fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkPrefab: {fileID: 3712172722577698120, guid: dfbf43ae506809b418f031e6c8c2445b, type: 3}
+  chunkPrefab: {fileID: 4056589371888419202, guid: dfbf43ae506809b418f031e6c8c2445b, type: 3}
   chunkSize: 16
-  viewDistance: 3
+  viewDistance: 1
+  numLayers: 4
+--- !u!114 &6711196347813437849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8367847032250825294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8528a97df486b848966f35841f9c0e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7358179185857445451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68,3 +83,23 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &1742715074702858018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8367847032250825294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47ccd09026a9f6541917a14114220706, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  thresoldMain: 0.35
+  useRandomSeed: 0
+  globalZoom: 188
+  globalCutout: 488
+  size: 10
+  zoom: 10
+  k_1: 10
+  useK: 0

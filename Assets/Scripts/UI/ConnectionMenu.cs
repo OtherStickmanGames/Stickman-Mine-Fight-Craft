@@ -5,18 +5,22 @@ using UnityEngine.SceneManagement;
 
 public class ConnectionMenu : MonoBehaviour
 {
-    public Button connectButton;
+    public Button connectButton1;
+    public Button connectButton2;
     public Button hostButton;
     public string gameSceneName = "GameScene";
 
     private void Start()
     {
-        connectButton.onClick.AddListener(ConnectToServer);
+        connectButton1.onClick.AddListener(() => ConnectToServer(1));
+        connectButton2.onClick.AddListener(() => ConnectToServer(2));
         hostButton.onClick.AddListener(StartHost);
     }
 
-    private void ConnectToServer()
-    { 
+    private void ConnectToServer(int clientNumber)
+    {
+        ClientIdentifier.ClientNumber = clientNumber;
+        ClientIdentifier.InitializeClientId(clientNumber);
         NetworkManager.Singleton.StartClient();
     }
 
@@ -35,6 +39,11 @@ public class ConnectionMenu : MonoBehaviour
         if (NetworkManager.Singleton.IsHost && NetworkManager.Singleton.IsServer)
         {
             SceneManager.LoadScene(gameSceneName);
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            PlayerPrefs.DeleteAll();
         }
     }
 }

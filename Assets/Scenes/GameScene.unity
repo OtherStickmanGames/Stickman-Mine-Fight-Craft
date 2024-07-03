@@ -154,8 +154,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 8137730806196308328, guid: 0aab4768c7b917e43b1c58011b9c5549, type: 3}
-  housePrefab: {fileID: 6648976604018719638, guid: c001b024df1d2be4ca135e3c0c7d6399, type: 3}
   worldManagerPrefab: {fileID: 8367847032250825294, guid: ec61f5a41d4ce5b40a5425bec0f8da4a, type: 3}
+  villagePrefab: {fileID: 6648976604018719638, guid: c001b024df1d2be4ca135e3c0c7d6399, type: 3}
 --- !u!4 &478278356
 Transform:
   m_ObjectHideFlags: 0

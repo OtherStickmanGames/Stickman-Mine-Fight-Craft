@@ -4,8 +4,8 @@ using UnityEngine;
 
 public static class BLOCKS
 {
-    public static int EMPTY = -1;
-    public static int GROUND = 0;
-    public static int DIRT = 1;
-    public static int STONE = 2;
+    public static int EMPTY = 0;
+    public static int GROUND = 1;
+    public static int DIRT = 2;
+    public static int STONE = 3;
 }
