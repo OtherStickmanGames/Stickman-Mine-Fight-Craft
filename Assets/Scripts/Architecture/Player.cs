@@ -1,11 +1,13 @@
 using Unity.Netcode;
 using UnityEngine;
 using System;
+using UnityEngine.Events;
 
 namespace Architecture
 {
     public class Player : NetworkBehaviour
     {
+        public static UnityEvent<Player> onOwnerSpawn = new UnityEvent<Player>();
         public event Action<Vector3> OnPositionChanged;
 
         private Vector3 lastPosition;
@@ -32,6 +34,8 @@ namespace Architecture
 
                 // Add event listener for position changes
                 NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+
+                onOwnerSpawn?.Invoke(this);
             }
         }
 

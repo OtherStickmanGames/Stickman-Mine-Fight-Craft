@@ -85,7 +85,9 @@
     <Compile Include="Assets\Scripts\UI\PlayerInput.cs" />
     <Compile Include="Assets\Scripts\Utils\Language\Language.cs" />
     <Compile Include="Assets\Scripts\AnimationEvents.cs" />
+    <Compile Include="Assets\Scripts\Architecture\WorldGenerator.cs" />
     <Compile Include="Assets\YandexGame\Example\ExampleScripts\LanguageExample.cs" />
+    <Compile Include="Assets\Scripts\Architecture\Variant_1.cs" />
     <Compile Include="Assets\Scripts\Chunck.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralBasics2d.cs" />
     <Compile Include="Assets\Scripts\Architecture\PlayerController.cs" />
@@ -167,6 +169,7 @@
     <Compile Include="Assets\Scripts\Combat\WeaponSet.cs" />
     <Compile Include="Assets\YandexGame\Addons\UnityToolbag-main\ConditionallyVisiblePropertyDrawer\Runtime\ConditionallyVisibleAttribute.cs" />
     <Compile Include="Assets\LeanTween\Examples\Scripts\PathBezier.cs" />
+    <Compile Include="Assets\testoeb.cs" />
     <Compile Include="Assets\Scripts\UI\ItemView.cs" />
     <Compile Include="Assets\Scripts\UI\LayerSwitcher.cs" />
     <Compile Include="Assets\LeanTween\Testing\Testing240.cs" />
@@ -195,7 +198,6 @@
     <Compile Include="Assets\LeanTween\Framework\LTSeq.cs" />
     <Compile Include="Assets\Scripts\UserData.cs" />
     <Compile Include="Assets\Scripts\Utils\FPSCounter.cs" />
-    <Compile Include="Assets\Scripts\Architecture\Layer.cs" />
     <Compile Include="Assets\LeanTween\Framework\LeanTween.cs" />
     <Compile Include="Assets\YandexGame\ScriptsYG\PaymentsYG.cs" />
     <Compile Include="Assets\Scripts\Utils\CheckMenuLoad.cs" />

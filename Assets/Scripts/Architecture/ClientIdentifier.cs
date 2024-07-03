@@ -35,7 +35,6 @@ public class ClientIdentifier : MonoBehaviour
         var saveStr = $"{position.x}:{position.y}:{position.z}";
         PlayerPrefs.SetString(positionKey, saveStr);
         PlayerPrefs.Save();
-        print(saveStr);
     }
 
     public static Vector3 LoadPlayerPosition()

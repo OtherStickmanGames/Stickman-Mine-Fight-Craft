@@ -19,41 +19,41 @@ public class BlockManager : NetworkBehaviour
     }
 
     // Method to handle block changes requested by the player
-    public void RequestBlockChange(Vector2Int position, bool isAdding)
+    public void RequestBlockChange(int layer, Vector2Int position, bool isAdding)
     {
         if (IsServer)
         {
             // If called on the server, directly update the block
-            SetBlock(position, isAdding);
+            SetBlock(layer, position, isAdding);
         }
         else
         {
             // If called on the client, send a request to the server
-            RequestBlockChangeServerRpc(position, isAdding);
+            RequestBlockChangeServerRpc(layer, position, isAdding);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestBlockChangeServerRpc(Vector2Int position, bool isAdding)
+    private void RequestBlockChangeServerRpc(int layer, Vector2Int position, bool isAdding)
     {
-        SetBlock(position, isAdding);
+        SetBlock(layer, position, isAdding);
     }
 
     // Method to set a block on the server and sync with clients
-    private void SetBlock(Vector2Int position, bool isAdding)
+    public void SetBlock(int layer, Vector2Int position, bool isAdding)
     {
-        Chunk chunk = WorldManager.Instance.GetOrCreateChunk(position);
+        Chunk chunk = WorldManager.Instance.GetOrCreateChunk(layer, position);
         if (chunk != null)
         {
             chunk.SetBlock(position, isAdding);
-            SyncBlockClientRpc(position, isAdding);
+            SyncBlockClientRpc(layer, position, isAdding);
         }
     }
 
     [ClientRpc]
-    private void SyncBlockClientRpc(Vector2Int position, bool isAdding)
+    private void SyncBlockClientRpc(int layer, Vector2Int position, bool isAdding)
     {
-        Chunk chunk = WorldManager.Instance.GetOrCreateChunk(position);
+        Chunk chunk = WorldManager.Instance.GetOrCreateChunk(layer, position);
         if (chunk != null)
         {
             chunk.SetBlock(position, isAdding);

@@ -15,22 +15,22 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsOwner && Input.GetMouseButtonDown(0))
         {
-            Vector3Int blockPosition = GetBlockPositionFromMouse();
+            Vector2Int blockPosition = GetBlockPositionFromMouse();
             int layerIndex = 0; // Пример, используйте правильный индекс слоя
             blockManager.SetBlock(layerIndex, blockPosition, true);
         }
 
         if (IsOwner && Input.GetMouseButtonDown(1))
         {
-            Vector3Int blockPosition = GetBlockPositionFromMouse();
+            Vector2Int blockPosition = GetBlockPositionFromMouse();
             int layerIndex = 0; // Пример, используйте правильный индекс слоя
             blockManager.SetBlock(layerIndex, blockPosition, false);
         }
     }
 
-    private Vector3Int GetBlockPositionFromMouse()
+    private Vector2Int GetBlockPositionFromMouse()
     {
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        return new Vector3Int(Mathf.FloorToInt(mousePosition.x), Mathf.FloorToInt(mousePosition.y), 0);
+        return new Vector2Int(Mathf.FloorToInt(mousePosition.x), Mathf.FloorToInt(mousePosition.y));
     }
 }
