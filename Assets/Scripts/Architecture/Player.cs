@@ -84,7 +84,7 @@ namespace Architecture
             {
                 lastPosition = currentPosition;
                 OnPositionChanged?.Invoke(currentPosition);
-                Debug.Log($"Position changed: {currentPosition}");
+                //Debug.Log($"Position changed: {currentPosition}");
                 NotifyServerOfPositionChangeServerRpc(currentPosition);
             }
         }

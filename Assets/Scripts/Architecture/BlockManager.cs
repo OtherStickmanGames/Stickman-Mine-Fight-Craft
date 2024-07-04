@@ -40,25 +40,19 @@ public class BlockManager : NetworkBehaviour
     }
 
     // Method to set a block on the server and sync with clients
-    public void SetBlock(int layer, Vector2Int position, int blockID)
+    public void SetBlock(int layer, Vector2 position, int blockID)
     {
-        Chunk chunk = WorldManager.Instance.GetOrCreateChunk(layer, position);
+        Chunk chunk = WorldManager.Instance.GetChunck(layer, position);
         if (chunk != null)
         {
             chunk.SetBlock(position, blockID);
-            SyncBlockClientRpc(layer, position, blockID);
+            SyncBlock(layer, position, blockID);
         }
-        print(position);
     }
 
-    [ClientRpc]
-    private void SyncBlockClientRpc(int layer, Vector2Int position, int blockID)
+    private void SyncBlock(int layer, Vector2 worldPosition, int blockID)
     {
-        Chunk chunk = WorldManager.Instance.GetOrCreateChunk(layer, position);
-        if (chunk != null)
-        {
-            chunk.SetBlock(position, blockID);
-        }
+        WorldManager.Instance.SetBlockServerRpc(layer, worldPosition, blockID);
     }
 
     // Save world state (can be called on the server)

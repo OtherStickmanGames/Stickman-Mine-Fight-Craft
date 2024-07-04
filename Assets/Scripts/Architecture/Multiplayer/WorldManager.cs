@@ -262,6 +262,19 @@ namespace Architecture
             return chunk;
         }
 
+        Vector2Int chunckKey;
+        public Chunk GetChunck(int layer, Vector2 globalPos)
+        {
+            chunckKey.x = Mathf.FloorToInt(globalPos.x / chunkSize);
+            chunckKey.y = Mathf.FloorToInt(globalPos.y / chunkSize);
+            var chunks = layers[layer];
+            if (chunks.TryGetValue(chunckKey, out Chunk chunk))
+            {
+                return chunk;
+            }
+            return null;
+        }
+
         private Chunk GenerateChunk(int layer, Vector2Int chunkKey)
         {
             var chunk = Instantiate(chunkPrefab);
@@ -274,12 +287,9 @@ namespace Architecture
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void SetBlockServerRpc(Vector2Int chunkCoord, Vector2Int blockCoord, bool isAdding)
+        public void SetBlockServerRpc(int layer, Vector2 worldPosition, int blockID)
         {
-            //Chunk chunk = GetOrCreateChunk(chunkCoord);
-            //chunk.SetBlock(blockCoord, isAdding);
-            //SaveWorldState();
-            //SetBlockClientRpc(chunkCoord, blockCoord, isAdding);
+            print("надо сохр нахр");
         }
 
         [ClientRpc]

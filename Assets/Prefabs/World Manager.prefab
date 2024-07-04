@@ -106,7 +106,15 @@ MonoBehaviour:
     sprite: {fileID: 862813911, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
   thresoldMain: 0.35
   useRandomSeed: 0
-  globalZoom: 300
+  globalZoom:
+  - 300
+  - 180
+  - 350
+  - 500
   globalCutout: 800
   size: 11
-  zoom: 50
+  zoom:
+  - 50
+  - 30
+  - 80
+  - 130

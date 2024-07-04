@@ -15,22 +15,28 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsOwner && Input.GetMouseButtonDown(0))
         {
-            Vector2Int blockPosition = GetBlockPositionFromMouse();
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //Vector2Int blockPosition = GetBlockPositionFromMouse();
             int layerIndex = 0; // Пример, используйте правильный индекс слоя
-            blockManager.SetBlock(layerIndex, blockPosition, 0);
+            blockManager.SetBlock(layerIndex, mousePosition, 0);
         }
 
         if (IsOwner && Input.GetMouseButtonDown(1))
         {
-            Vector2Int blockPosition = GetBlockPositionFromMouse();
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             int layerIndex = 0; // Пример, используйте правильный индекс слоя
-            blockManager.SetBlock(layerIndex, blockPosition, 2);
+            blockManager.SetBlock(layerIndex, mousePosition, 2);
         }
     }
 
     private Vector2Int GetBlockPositionFromMouse()
     {
+        int chunkSize = WorldManager.Instance.chunkSize;
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        return new Vector2Int(Mathf.FloorToInt(mousePosition.x), Mathf.FloorToInt(mousePosition.y));
+        Vector2Int chunckPosition = new(Mathf.FloorToInt(mousePosition.x / chunkSize), Mathf.FloorToInt(mousePosition.y / chunkSize));
+        chunckPosition *= chunkSize;
+        Vector2Int blockPosition = new(Mathf.FloorToInt(mousePosition.x - chunckPosition.x), Mathf.FloorToInt(mousePosition.y - chunckPosition.y));
+        //print($"{chunckPosition} -=-=- {blockPosition}");
+        return blockPosition;
     }
 }

@@ -30,13 +30,13 @@ public class Chunk : MonoBehaviour
         {
             for (int y = 0; y < chunckSize; y++)
             {
-                var idBlock = WorldGenerator.GetBlockID(x + chunkPosition.x, y + chunkPosition.y);
+                var idBlock = ProceduralGenerator.GetBlockID(x + chunkPosition.x, y + chunkPosition.y, layer);
 
                 if (idBlock == 0)
                     continue;
 
                 var t = ScriptableObject.CreateInstance(typeof(Tile)) as Tile;
-                t.sprite = WorldGenerator.Instance.blocksData[idBlock].sprite;
+                t.sprite = ProceduralGenerator.Instance.blocksData[idBlock].sprite;
                 var color = Color.white * layerDarkness.Evaluate(layer);
                 color.a = 1;
                 t.color = color;
@@ -48,12 +48,29 @@ public class Chunk : MonoBehaviour
         }
     }
 
-    public void SetBlock(Vector2Int localPosition, int blockId)
+    Vector2Int blockPosition;
+    public void SetBlock(Vector2 globalPosition, int blockId)
     {
-        if (IsValidCoordinate(localPosition))
+        blockPosition.x = Mathf.FloorToInt(globalPosition.x - transform.position.x);
+        blockPosition.y = Mathf.FloorToInt(globalPosition.y - transform.position.y);
+        if (IsValidCoordinate(blockPosition))
         {
-            blocks[localPosition.x, localPosition.y] = blockId;
+            blocks[blockPosition.x, blockPosition.y] = blockId;
+            UpdateTilemap(globalPosition, blockId);
         }
+    }
+
+    public void UpdateTilemap(Vector2 worldPosition, int blockId)
+    {
+        var tilePos = tilemap.WorldToCell(worldPosition);
+        var tile = tilemap.GetTile<Tile>(tilePos);
+        if (!tile)
+        {
+            tile = ScriptableObject.CreateInstance<Tile>();
+            tilemap.SetTile(tilePos, tile);
+        }
+        tile.sprite = ProceduralGenerator.Instance.blocksData[blockId].sprite;
+        tilemap.RefreshTile(tilePos);
     }
 
     public int GetBlock(Vector2Int localPosition)
