@@ -10,7 +10,7 @@ public class Chunk : MonoBehaviour
 {
     [SerializeField] AnimationCurve layerDarkness;
     public Vector2Int Position { get; private set; }
-    private int[,] blocks;
+    public int[,] blocks;
     private const int chunckSize = 16;
 
     public TilemapCollider2D Collider => collider;

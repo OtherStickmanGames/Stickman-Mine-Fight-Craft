@@ -3,6 +3,7 @@ using Unity.Netcode;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using System.Linq;
 
 namespace Architecture
 {
@@ -161,7 +162,7 @@ namespace Architecture
                         {
                             for (int y = 0; y < chunkSize; y++)
                             {
-                                chunk.SetBlock(chunkCoord, chunkData.blocks[x, y]);
+                                //chunk.SetBlock(chunkCoord, chunkData.blocks[x, y]);
                             }
                         }
 
@@ -289,7 +290,38 @@ namespace Architecture
         [ServerRpc(RequireOwnership = false)]
         public void SetBlockServerRpc(int layer, Vector2 worldPosition, int blockID)
         {
-            print("надо сохр нахр");
+            Vector2Int chunckPosition = new(Mathf.FloorToInt(worldPosition.x / chunkSize), Mathf.FloorToInt(worldPosition.y / chunkSize));
+            chunckPosition *= chunkSize;
+            Vector2Int blockPosition = new(Mathf.FloorToInt(worldPosition.x - chunckPosition.x), Mathf.FloorToInt(worldPosition.y - chunckPosition.y));
+
+            var filePath = $"{Application.dataPath}/Data/Server/Chunck{chunckPosition}.json";
+            if (!File.Exists(filePath))
+            {
+                var chunckData = new ChunkData(chunckPosition);
+                chunckData.blocks.Add(new BlockData(blockPosition, blockID));
+                var json = JsonUtility.ToJson(chunckData);
+                File.WriteAllText(filePath, json);
+            }
+            else
+            {
+                var json = File.ReadAllText(filePath);
+                var chunckData = JsonUtility.FromJson<ChunkData>(json);
+                var blockData = chunckData.blocks.Find(b => b.x == blockPosition.x && b.y == blockPosition.y);
+                if (blockData == null)
+                {
+                    chunckData.blocks.Add(new BlockData(blockPosition, blockID));
+                }
+                else
+                {
+                    blockData.id = blockID;
+                }
+                json = JsonUtility.ToJson(chunckData);
+                File.WriteAllText(filePath, json);
+            }
+
+#if UNITY_EDITOR
+            UnityEditor.AssetDatabase.Refresh();
+#endif
         }
 
         [ClientRpc]
@@ -447,9 +479,38 @@ namespace Architecture
     public class ChunkData
     {
         public int x, y;
-        public int[,] blocks;
+        public List<BlockData> blocks;
 
-        // Добавьте другие данные чанка, если необходимо
+        public ChunkData(Vector2Int chunckPos)
+        {
+            x = chunckPos.x;
+            y = chunckPos.y;
+            blocks = new List<BlockData>();
+        }
+
+        private ChunkData() { }
+    }
+
+    [Serializable]
+    public class BlockData
+    {
+        public int x, y, id;
+
+        public BlockData(int x, int y, int id)
+        {
+            this.x = x;
+            this.y = y;
+            this.id = id;
+        }
+
+        public BlockData(Vector2Int pos, int id)
+        {
+            this.x = pos.x;
+            this.y = pos.y;
+            this.id = id;
+        }
+
+        private BlockData() { }
     }
 }
 
