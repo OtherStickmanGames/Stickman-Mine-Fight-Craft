@@ -89,25 +89,69 @@ namespace Architecture
             var playerPosition = player.transform.position;
             Vector2Int currentChunkCoord = GetChunkCoordFromPosition(playerPosition);
 
-            for (int xOffset = -viewDistance; xOffset <= viewDistance; xOffset++)
+            for (int i = 0; i < numLayers; i++)
             {
-                for (int yOffset = -viewDistance; yOffset <= viewDistance; yOffset++)
+                for (int xOffset = -viewDistance; xOffset <= viewDistance; xOffset++)
                 {
-                    Vector2Int chunkCoord = currentChunkCoord + new Vector2Int(xOffset, yOffset);
-
-                    for (int i = 0; i < numLayers; i++)
+                    for (int yOffset = -viewDistance; yOffset <= viewDistance; yOffset++)
                     {
+                        Vector2Int chunkCoord = currentChunkCoord + new Vector2Int(xOffset, yOffset);
+
                         var chuncks = layers[i];
                         if (!chuncks.ContainsKey(chunkCoord))
                         {
                             var chunk = GenerateChunk(i, chunkCoord);
                             chuncks[chunkCoord] = chunk;
-                            //RequestChunkSpawnClientRpc(chunkCoord);
 
+                            RequestChunckDataServerRpc(i, chunkCoord * chunkSize);
                             return;
+                        }
+                        else
+                        {
+                            var chunck = chuncks[chunkCoord];
+                            if (!chunck.isActiveAndEnabled)
+                            {
+                                chunck.gameObject.SetActive(true);
+                                RequestChunckDataServerRpc(i, chunkCoord * chunkSize);
+                                continue;
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void RequestChunckDataServerRpc(int layer, Vector2Int chunckPosition, ServerRpcParams serverRpcParams = default)
+        {
+            var filePath = ChunckFilePath(layer, chunckPosition);
+            if (File.Exists(filePath))
+            {
+                var json = File.ReadAllText(filePath);
+                var chunckData = JsonUtility.FromJson<ChunkData>(json);
+
+                var clientPrcParams = new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new[] { serverRpcParams.Receive.SenderClientId }
+                    }
+                };
+
+                var blocksPos = chunckData.blocks.Select(b => new Vector2Int(b.x, b.y)).ToArray();
+                var blocksId = chunckData.blocks.Select(b => b.id).ToArray();
+                ReceiveChunckDataClientRpc(layer, chunckPosition, blocksPos, blocksId, clientPrcParams);
+            }
+        }
+
+        [ClientRpc]
+        public void ReceiveChunckDataClientRpc(int layer, Vector2Int chunckPos, Vector2Int[] blocksPos, int[] blocksId, ClientRpcParams clientRpcParams = default)
+        {
+            var chunck = GetChunck(layer, chunckPos);
+            var length = blocksId.Length;
+            for (int i = 0; i < length; i++)
+            {
+                chunck.SetBlock(blocksPos[i], blocksId[i]);
             }
         }
 
@@ -208,7 +252,7 @@ namespace Architecture
         {
             // Логика синхронизации блока с другими клиентами
             // Вызывается метод RPC для синхронизации блока
-            SetBlockClientRpc(layer, globalPosition, blockID);
+            //SetBlockClientRpc(layer, globalPosition, blockID);
         }
 
         private Chunk CreateChunk(int layer, Vector2Int chunkCoord)
@@ -221,14 +265,14 @@ namespace Architecture
             return chunk;
         }
 
-        public int GetBlock(int layer, Vector3Int globalPosition)
+        public int GetBlock(int layer, Vector2Int globalPosition)
         {
-            Vector2Int chunkCoord = new Vector2Int(globalPosition.x / chunkSize, globalPosition.y / chunkSize);
-            Vector2Int localPosition = new Vector2Int(globalPosition.x % chunkSize, globalPosition.y % chunkSize);
+            var chunckKey = new Vector2Int(globalPosition.x / chunkSize, globalPosition.y / chunkSize);
+            var localPosition = new Vector2Int(globalPosition.x % chunkSize, globalPosition.y % chunkSize);
 
             if (layers.TryGetValue(layer, out var layerChunks))
             {
-                if (layerChunks.TryGetValue(chunkCoord, out var chunk))
+                if (layerChunks.TryGetValue(chunckKey, out var chunk))
                 {
                     return chunk.GetBlock(localPosition);
                 }
@@ -278,23 +322,28 @@ namespace Architecture
 
         private Chunk GenerateChunk(int layer, Vector2Int chunkKey)
         {
-            var chunk = Instantiate(chunkPrefab);
+            var chunk = Instantiate(chunkPrefab, transform);
             chunk.name = $"Chunk-Layer:{layer}";
             chunk.transform.position = new Vector3(chunkKey.x * chunkSize, chunkKey.y * chunkSize, layer);
             var chunkPosition = new Vector2Int(chunkKey.x * chunkSize, chunkKey.y * chunkSize);
             chunk.Initialize(layer, chunkPosition);
-            Debug.Log($"Chunck generated: {chunkKey}");
+            //Debug.Log($"Chunck generated: {chunkKey}");
             return chunk;
         }
 
+        string ChunckFilePath(int layer, Vector2Int chunckPosition)
+        {
+            return $"{Application.dataPath}/Data/Server/Chunck{chunckPosition}Layer{layer}.json";
+        }
+
         [ServerRpc(RequireOwnership = false)]
-        public void SetBlockServerRpc(int layer, Vector2 worldPosition, int blockID)
+        public void SetBlockServerRpc(int layer, Vector2 worldPosition, int blockID, ServerRpcParams serverRpcParams = default)
         {
             Vector2Int chunckPosition = new(Mathf.FloorToInt(worldPosition.x / chunkSize), Mathf.FloorToInt(worldPosition.y / chunkSize));
             chunckPosition *= chunkSize;
             Vector2Int blockPosition = new(Mathf.FloorToInt(worldPosition.x - chunckPosition.x), Mathf.FloorToInt(worldPosition.y - chunckPosition.y));
 
-            var filePath = $"{Application.dataPath}/Data/Server/Chunck{chunckPosition}.json";
+            var filePath = ChunckFilePath(layer, chunckPosition);
             if (!File.Exists(filePath))
             {
                 var chunckData = new ChunkData(chunckPosition);
@@ -322,13 +371,46 @@ namespace Architecture
 #if UNITY_EDITOR
             UnityEditor.AssetDatabase.Refresh();
 #endif
+
+            CheckChunckChangeNearestPlayers(layer, worldPosition, blockID, serverRpcParams.Receive.SenderClientId);
+        }
+
+        void CheckChunckChangeNearestPlayers(int layer, Vector2 worldPosition, int blockID, ulong clientID)
+        {
+            foreach (var client in NetworkManager.Singleton.ConnectedClients)
+            {
+                if (client.Key == clientID)
+                    continue;
+
+                var playerObject = client.Value.PlayerObject;
+                if (!playerObject)
+                    continue;
+
+                //print($"{client.Key} == {client.Value.PlayerObject}");
+                var dist = Vector2.Distance(playerObject.transform.position, worldPosition);
+                if (dist < (viewDistance + 1) * chunkSize)
+                {
+                    var crp = new ClientRpcParams
+                    {
+                        Send = new ClientRpcSendParams
+                        {
+                            TargetClientIds = new[] { client.Key }
+                        }
+                    };
+                    SetBlockClientRpc(layer, worldPosition, blockID, crp);
+                }
+            }
         }
 
         [ClientRpc]
-        private void SetBlockClientRpc(int layer, Vector3Int globalPosition, int blockID)
+        private void SetBlockClientRpc(int layer, Vector2 worldPosition, int blockID, ClientRpcParams clientRpcParams = default)
         {
-            if (IsServer) return;
-            SetBlock(layer, globalPosition, blockID);
+            var chunck = GetChunck(layer, worldPosition);
+            if (chunck)
+            {
+                chunck.SetBlock(worldPosition, blockID);
+            }
+            //SetBlock(layer, globalPosition, blockID);
         }
 
         [ClientRpc]
@@ -338,16 +420,6 @@ namespace Architecture
             chunk.SetBlock(blockCoord, blockID);
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void RequestChunkSpawnServerRpc(Vector2Int chunkCoord)
-        {
-            //if (!chunks.ContainsKey(chunkCoord))
-            //{
-            //    Chunk chunk = GenerateChunk(chunkCoord);
-            //    chunks[chunkCoord] = chunk;
-            //    SyncChunkWithAllClients(chunk);
-            //}
-        }
 
         public void SavePlayerPosition(string clientId, Vector3 position)
         {
@@ -364,46 +436,7 @@ namespace Architecture
 
             return Vector3.zero; // Если позиция не найдена, возвращаем позицию (0,0,0)
         }
-
-        private void SyncChunkWithAllClients(Chunk chunk)
-        {
-            //foreach (var block in chunk.GetAllBlocks())
-            //{
-            //    SetBlockClientRpc(chunk.Position, block.Key, block.Value);
-            //}
-        }
-
-        
-
-        public void SaveWorldState()
-        {
-            //Dictionary<Vector2Int, Dictionary<Vector2Int, bool>> worldState = new Dictionary<Vector2Int, Dictionary<Vector2Int, bool>>();
-            //foreach (var chunk in chunks)
-            //{
-            //    worldState[chunk.Key] = chunk.Value.GetAllBlocks();
-            //}
-
-            //string json = JsonUtility.ToJson(new Serialization<Vector2Int, Dictionary<Vector2Int, bool>>(worldState));
-            //File.WriteAllText(saveFilePath, json);
-        }
-
-        public void LoadWorldStateFromStorage()
-        {
-            //if (File.Exists(saveFilePath))
-            //{
-            //    string json = File.ReadAllText(saveFilePath);
-            //    var worldState = JsonUtility.FromJson<Serialization<Vector2Int, Dictionary<Vector2Int, bool>>>(json).ToDictionary();
-
-            //    foreach (var chunk in worldState)
-            //    {
-            //        Chunk newChunk = GetOrCreateChunk(chunk.Key);
-            //        foreach (var block in chunk.Value)
-            //        {
-            //            newChunk.SetBlock(block.Key, block.Value);
-            //        }
-            //    }
-            //}
-        }
+  
 
         public void CheckAndSyncChunks()
         {

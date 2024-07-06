@@ -15,6 +15,12 @@ namespace Architecture
         [SerializeField]
         private Vector3 nextVillagePosition = Vector3.zero;
         private float villageOffset = 20.0f;  // Смещение для каждой новой деревни
+        int seedStartPos;
+
+        private void Awake()
+        {
+            seedStartPos = Random.Range(-300, 300);
+        }
 
         private void Start()
         {
@@ -27,7 +33,7 @@ namespace Architecture
             }
         }
 
-        
+
 
         private void OnClientConnected(ulong clientId)
         {
@@ -40,8 +46,32 @@ namespace Architecture
                     playerStartingPositions[clientIdString] = villagePosition;
                 }
 
-                SpawnPlayer(clientId, playerStartingPositions[clientIdString]);
+                var pos = GetRandomStartPos(clientId);
+                //SpawnPlayer(clientId, playerStartingPositions[clientIdString]);
+                SpawnPlayer(clientId, pos);
             }
+        }
+
+        Vector2 GetRandomStartPos(ulong clientId)
+        {
+            Random.InitState(seedStartPos + (int)clientId);
+            var posX = Random.Range(-300, 300);
+            var posY = 1300;
+            bool foundY = false;
+            while (!foundY)
+            {
+                var blockId = ProceduralGenerator.GetBlockID(posX, posY, 0);
+                if (blockId > 0)
+                {
+                    foundY = true;
+                }
+                else
+                {
+                    posY--;
+                }
+            }
+
+            return new Vector2(posX, posY + 2);
         }
 
 

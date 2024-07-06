@@ -3,7 +3,7 @@ using UnityEngine;
 public class ClientIdentifier : MonoBehaviour
 {
     public static int ClientNumber { get; set; }
-    private static readonly string ClientIdKeyPrefix = "ClientID_";
+    public static readonly string ClientIdKeyPrefix = "ClientID_";
     private static string clientId;
 
     public static void InitializeClientId(int clientNumber)

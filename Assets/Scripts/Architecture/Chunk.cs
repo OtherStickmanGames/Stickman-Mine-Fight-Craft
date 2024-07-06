@@ -1,30 +1,36 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Architecture;
 
-[RequireComponent(typeof(Grid))]
+//[RequireComponent(typeof(Grid))]
 [RequireComponent(typeof(Tilemap))]
 [RequireComponent(typeof(TilemapRenderer))]
 [RequireComponent(typeof(TilemapCollider2D))]
 public class Chunk : MonoBehaviour
 {
+    [SerializeField] Tilemap tilemap;
+    [SerializeField] private new TilemapCollider2D collider;
     [SerializeField] AnimationCurve layerDarkness;
-    public Vector2Int Position { get; private set; }
+    
     public int[,] blocks;
-    private const int chunckSize = 16;
 
+    public Vector2Int Position { get; private set; }
     public TilemapCollider2D Collider => collider;
     public Tilemap Tilemap => tilemap;
 
-    new TilemapCollider2D collider;
-    Tilemap tilemap;
+    Transform player;
+
+    const int chunckSize = 16;
 
     public void Initialize(int layer, Vector2Int chunkPosition)
     {
-        tilemap = GetComponent<Tilemap>();
-        
         Position = chunkPosition;
         blocks = new int[chunckSize, chunckSize];
+
+        var color = Color.white * layerDarkness.Evaluate(layer);
+        color.a = 1;
 
         for (int x = 0; x < chunckSize; x++)
         {
@@ -35,10 +41,8 @@ public class Chunk : MonoBehaviour
                 if (idBlock == 0)
                     continue;
 
-                var t = ScriptableObject.CreateInstance(typeof(Tile)) as Tile;
+                var t = ScriptableObject.CreateInstance<Tile>();
                 t.sprite = ProceduralGenerator.Instance.blocksData[idBlock].sprite;
-                var color = Color.white * layerDarkness.Evaluate(layer);
-                color.a = 1;
                 t.color = color;
                 var tilePos = new Vector3Int(x, y);
                 tilemap.SetTile(tilePos, t);
@@ -46,6 +50,8 @@ public class Chunk : MonoBehaviour
                 blocks[x, y] = idBlock;
             }
         }
+
+        player = NetworkManager.Singleton.LocalClient.PlayerObject.transform;
     }
 
     Vector2Int blockPosition;
@@ -60,9 +66,28 @@ public class Chunk : MonoBehaviour
         }
     }
 
+    public void SetBlock(Vector2Int blockPos, int blockId)
+    {
+        blocks[blockPosition.x, blockPosition.y] = blockId;
+        UpdateTilemap(blockPos, blockId);
+    }
+
     public void UpdateTilemap(Vector2 worldPosition, int blockId)
     {
         var tilePos = tilemap.WorldToCell(worldPosition);
+        var tile = tilemap.GetTile<Tile>(tilePos);
+        if (!tile)
+        {
+            tile = ScriptableObject.CreateInstance<Tile>();
+            tilemap.SetTile(tilePos, tile);
+        }
+        tile.sprite = ProceduralGenerator.Instance.blocksData[blockId].sprite;
+        tilemap.RefreshTile(tilePos);
+    }
+
+    public void UpdateTilemap(Vector2Int blockPos, int blockId)
+    {
+        var tilePos = new Vector3Int(blockPos.x, blockPos.y);
         var tile = tilemap.GetTile<Tile>(tilePos);
         if (!tile)
         {
@@ -111,16 +136,18 @@ public class Chunk : MonoBehaviour
         return allBlocks;
     }
 
-    public void LoadChunkData(Dictionary<Vector2Int, int> chunkData)
-    {
-        foreach (var kvp in chunkData)
-        {
-            SetBlock(kvp.Key, kvp.Value);
-        }
-    }
-
     private bool IsValidCoordinate(Vector2Int coord)
     {
         return coord.x >= 0 && coord.x < chunckSize && coord.y >= 0 && coord.y < chunckSize;
+    }
+
+    float dist;
+    private void Update()
+    {
+        dist = Vector2.Distance(transform.position, player.position + (Vector3.one * WorldManager.Instance.chunkSize / 2));
+        if (dist > WorldManager.Instance.chunkSize * (WorldManager.Instance.viewDistance + 3))
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

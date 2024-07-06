@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6711196347813437849}
   - component: {fileID: 7358179185857445451}
   - component: {fileID: 1742715074702858018}
+  - component: {fileID: 8900984291806566022}
   m_Layer: 0
   m_Name: World Manager
   m_TagString: Untagged
@@ -118,3 +119,15 @@ MonoBehaviour:
   - 30
   - 80
   - 130
+--- !u!156049354 &8900984291806566022
+Grid:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8367847032250825294}
+  m_Enabled: 1
+  m_CellSize: {x: 1, y: 1, z: 1}
+  m_CellGap: {x: 0, y: 0, z: 0}
+  m_CellLayout: 0
+  m_CellSwizzle: 0

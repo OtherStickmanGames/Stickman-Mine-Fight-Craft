@@ -141,6 +141,7 @@
     <Compile Include="Assets\LeanTween\Testing\FollowingTests.cs" />
     <Compile Include="Assets\Scripts\NoobAIBehaviour.cs" />
     <Compile Include="Assets\YandexGame\ScriptsYG\LanguageYG.cs" />
+    <Compile Include="Assets\Scripts\UI\RemovePP.cs" />
     <Compile Include="Assets\Scripts\Combat\Melee.cs" />
     <Compile Include="Assets\YandexGame\ScriptsYG\PromptYG.cs" />
     <Compile Include="Assets\Scripts\UI\HUD.cs" />
