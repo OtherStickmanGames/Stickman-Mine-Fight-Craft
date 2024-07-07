@@ -71,7 +71,7 @@ namespace Architecture
                 }
             }
 
-            return new Vector2(posX, posY + 2);
+            return new Vector2(posX, posY + 3);
         }
 
 

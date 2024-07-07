@@ -11,12 +11,13 @@ namespace Architecture
         public event Action<Vector3> OnPositionChanged;
 
         private Vector3 lastPosition;
-
+        new Rigidbody2D rigidbody2D;
         private GameManager gameManager;
 
         public override void OnNetworkSpawn()
         {
             gameManager = FindObjectOfType<GameManager>();
+            rigidbody2D = GetComponent<Rigidbody2D>();
 
             if (IsOwner)
             {
@@ -67,14 +68,21 @@ namespace Architecture
             }
         }
 
+        private void LateUpdate()
+        {
+            
+        }
+
         private void HandleMovement()
         {
             float moveSpeed = 15f;
             float moveHorizontal = Input.GetAxis("Horizontal");
-            float moveVertical = Input.GetAxis("Vertical");
+            float moveVertical = Input.GetAxis("Vertical") * 3;
             //print(moveHorizontal);
-            Vector3 movement = new Vector3(moveHorizontal, moveVertical, 0) * moveSpeed * Time.deltaTime;
-            transform.Translate(movement);
+            var movement = moveSpeed * Time.deltaTime * new Vector3(moveHorizontal, moveVertical, 0);
+            //transform.Translate(movement);
+            //rigidbody2D.MovePosition(transform.position + movement);
+            rigidbody2D.AddForce(movement, ForceMode2D.Impulse);
         }
 
         private void CheckPositionChange()

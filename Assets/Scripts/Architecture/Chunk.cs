@@ -29,6 +29,9 @@ public class Chunk : MonoBehaviour
         Position = chunkPosition;
         blocks = new int[chunckSize, chunckSize];
 
+        if (layer != 0)
+            collider.enabled = false;
+
         var color = Color.white * layerDarkness.Evaluate(layer);
         color.a = 1;
 
