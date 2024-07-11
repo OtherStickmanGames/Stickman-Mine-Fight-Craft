@@ -105,6 +105,8 @@ MonoBehaviour:
     sprite: {fileID: -1518974828, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
   - name: STONE
     sprite: {fileID: 862813911, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
+  - name: COBBLESTONE
+    sprite: {fileID: -505962862, guid: 6ffbc72d66d8b574891548810286bd22, type: 3}
   thresoldMain: 0.35
   useRandomSeed: 0
   globalZoom:

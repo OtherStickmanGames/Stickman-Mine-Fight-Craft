@@ -169,6 +169,11 @@ public class EventsHolder
 
     public static LeftControl onLeftControl = new();
 
+    //         =============================================
+    public class AvailableSwitchLayer : UnityEvent<bool, LayerSwitchDir> { }
+
+    public static AvailableSwitchLayer onAvailableSwitchLayer = new();
+
     //-----------------------------------------------------------------------
 
     //========================= UI ============================

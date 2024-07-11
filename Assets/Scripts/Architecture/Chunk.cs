@@ -21,6 +21,7 @@ public class Chunk : MonoBehaviour
     public Tilemap Tilemap => tilemap;
 
     Transform player;
+    Color layerColor;
 
     const int chunckSize = 16;
 
@@ -29,11 +30,11 @@ public class Chunk : MonoBehaviour
         Position = chunkPosition;
         blocks = new int[chunckSize, chunckSize];
 
-        if (layer != 0)
-            collider.enabled = false;
+        gameObject.layer = LayerMask.NameToLayer($"LAYER_{layer}");
 
-        var color = Color.white * layerDarkness.Evaluate(layer);
-        color.a = 1;
+        layerColor = Color.white * layerDarkness.Evaluate(layer);
+        layerColor.a = 1;
+        tilemap.color = layerColor;
 
         for (int x = 0; x < chunckSize; x++)
         {
@@ -46,7 +47,7 @@ public class Chunk : MonoBehaviour
 
                 var t = ScriptableObject.CreateInstance<Tile>();
                 t.sprite = ProceduralGenerator.Instance.blocksData[idBlock].sprite;
-                t.color = color;
+                //t.color = layerColor;
                 var tilePos = new Vector3Int(x, y);
                 tilemap.SetTile(tilePos, t);
 
@@ -69,6 +70,34 @@ public class Chunk : MonoBehaviour
         }
     }
 
+    public int GetBlock(Vector2 worldPosition)
+    {
+        blockPosition.x = Mathf.FloorToInt(worldPosition.x - transform.position.x);
+        blockPosition.y = Mathf.FloorToInt(worldPosition.y - transform.position.y);
+        return blocks[blockPosition.x, blockPosition.y];
+    }
+
+    public void ChangeColor(int colorLayer)
+    {
+        var startColor = tilemap.color;
+        layerColor = Color.white * layerDarkness.Evaluate(colorLayer);
+        layerColor.a = tilemap.color.a;
+        LeanTween.value(gameObject, c =>
+        {
+            tilemap.color = c;
+        }, startColor, layerColor, 1.1f).setEaseInQuad();
+    }
+
+    public void Hide()
+    {
+        LeanTween.value(gameObject, a => 
+        {
+            var c = tilemap.color;
+            c.a = a;
+            tilemap.color = c;
+        }, 1, 0, 1f).setEaseInQuad();
+    }
+
     public void SetBlock(Vector2Int blockPos, int blockId)
     {
         blocks[blockPosition.x, blockPosition.y] = blockId;
@@ -82,6 +111,7 @@ public class Chunk : MonoBehaviour
         if (!tile)
         {
             tile = ScriptableObject.CreateInstance<Tile>();
+            //tile.color = layerColor;
             tilemap.SetTile(tilePos, tile);
         }
         tile.sprite = ProceduralGenerator.Instance.blocksData[blockId].sprite;
@@ -95,8 +125,10 @@ public class Chunk : MonoBehaviour
         if (!tile)
         {
             tile = ScriptableObject.CreateInstance<Tile>();
+            //tile.color = layerColor;
             tilemap.SetTile(tilePos, tile);
         }
+
         tile.sprite = ProceduralGenerator.Instance.blocksData[blockId].sprite;
         tilemap.RefreshTile(tilePos);
     }

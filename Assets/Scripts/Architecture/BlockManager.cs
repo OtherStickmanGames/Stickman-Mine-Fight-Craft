@@ -39,7 +39,6 @@ public class BlockManager : NetworkBehaviour
         SetBlock(layer, position, blockID);
     }
 
-    // Method to set a block on the server and sync with clients
     public void SetBlock(int layer, Vector2 position, int blockID)
     {
         Chunk chunk = WorldManager.Instance.GetChunck(layer, position);
@@ -55,15 +54,28 @@ public class BlockManager : NetworkBehaviour
         WorldManager.Instance.SetBlockServerRpc(layer, worldPosition, blockID);
     }
 
-    // Save world state (can be called on the server)
-    public void SaveWorldState()
+    public void SwitchLayer(int layer, LayerSwitchDir dir)
     {
-        //WorldManager.Instance.SaveWorldState();
+        WorldManager.Instance.SwitchLayer(layer, dir);
     }
 
-    // Load world state (can be called on the server)
-    public void LoadWorldState()
+    Vector2 checkablePos;
+    int checkableBlockId;
+    public bool CheckAvailableMoveToLayer(int layer, Vector2 worldPosition, int height = 2)
     {
-        //WorldManager.Instance.LoadWorldState();
+        if (layer < 0 || layer >= WorldManager.Instance.numLayers)
+            return false;
+
+        for (int i = 0; i < height; i++)
+        {
+            checkablePos = worldPosition + Vector2.up * i;
+            checkableBlockId = WorldManager.Instance.GetBlock(layer, checkablePos);
+            if (checkableBlockId > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

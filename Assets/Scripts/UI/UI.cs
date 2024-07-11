@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
@@ -26,14 +27,14 @@ public class UI : MonoBehaviour
         EventsHolder.onMineModeSwitch.AddListener(MineMode_Switched);
         EventsHolder.onBuildEditorMode.AddListener(BuildEditorState_Changed);
 
-        btnMineMode.onClick.AddListener(MineMode_Clicked);
+        //btnMineMode.onClick.AddListener(MineMode_Clicked);
 
-        MineMode_Switched(false);
+        //MineMode_Switched(false);
 
         layerSwitcher.Init();
-        tilesPalette.Init();
+        //tilesPalette.Init();
 
-        BuildEditorState_Changed(false);
+        //BuildEditorState_Changed(false);
     }
 
     private void BuildEditorState_Changed(bool enabled)
@@ -57,5 +58,20 @@ public class UI : MonoBehaviour
     {
         hud.Init(player);
         playerInput.Init(player);
+    }
+
+    public static bool IsHited()
+    {
+        var eventSystem = EventSystem.current;
+        var result = new List<RaycastResult>();
+        var pointer = new PointerEventData(eventSystem)
+        {
+            position = Input.mousePosition
+        };
+        eventSystem.RaycastAll(pointer, result);
+
+        var uiHit = result.Find(hit => hit.gameObject.layer == LayerMask.NameToLayer("UI"));
+
+        return uiHit.gameObject;
     }
 }

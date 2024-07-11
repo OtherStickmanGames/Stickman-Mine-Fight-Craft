@@ -10,6 +10,8 @@ namespace Architecture
         public static UnityEvent<Player> onOwnerSpawn = new UnityEvent<Player>();
         public event Action<Vector3> OnPositionChanged;
 
+        public PlayerController Controller { get; private set; }
+
         private Vector3 lastPosition;
         new Rigidbody2D rigidbody2D;
         private GameManager gameManager;
@@ -18,13 +20,14 @@ namespace Architecture
         {
             gameManager = FindObjectOfType<GameManager>();
             rigidbody2D = GetComponent<Rigidbody2D>();
+            Controller = GetComponent<PlayerController>();
 
             if (IsOwner)
             {
                 if (ClientIdentifier.HasSavedPosition())
                 {
                     Vector3 savedPosition = ClientIdentifier.LoadPlayerPosition();
-                    transform.position = savedPosition;
+                    transform.position = savedPosition + Vector3.up;
                 }
                 else
                 {
@@ -33,8 +36,8 @@ namespace Architecture
                     //ClientIdentifier.SavePlayerPosition(startingPosition);
                 }
 
-                // Add event listener for position changes
                 NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+                
 
                 onOwnerSpawn?.Invoke(this);
             }

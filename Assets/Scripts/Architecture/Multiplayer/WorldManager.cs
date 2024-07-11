@@ -103,6 +103,8 @@ namespace Architecture
                             var chunk = GenerateChunk(i, chunkCoord);
                             chuncks[chunkCoord] = chunk;
 
+                            UpdateChunckLayer(chunk, i);
+
                             RequestChunckDataServerRpc(i, chunkCoord * chunkSize);
                             return;
                         }
@@ -113,11 +115,26 @@ namespace Architecture
                             {
                                 chunck.gameObject.SetActive(true);
                                 RequestChunckDataServerRpc(i, chunkCoord * chunkSize);
+                                UpdateChunckLayer(chunck, i);
                                 continue;
                             }
                         }
                     }
                 }
+            }
+        }
+
+        private void UpdateChunckLayer(Chunk chunk, int chunkLayer)
+        {
+            var playerLayer = player.Controller.Layer;
+            if (playerLayer > chunkLayer)
+            {
+                chunk.Hide();
+            }
+            else
+            {
+                var colorLayer = chunkLayer - playerLayer;
+                chunk.ChangeColor(colorLayer);
             }
         }
 
@@ -265,20 +282,10 @@ namespace Architecture
             return chunk;
         }
 
-        public int GetBlock(int layer, Vector2Int globalPosition)
+        public int GetBlock(int layer, Vector2 globalPosition)
         {
-            var chunckKey = new Vector2Int(globalPosition.x / chunkSize, globalPosition.y / chunkSize);
-            var localPosition = new Vector2Int(globalPosition.x % chunkSize, globalPosition.y % chunkSize);
-
-            if (layers.TryGetValue(layer, out var layerChunks))
-            {
-                if (layerChunks.TryGetValue(chunckKey, out var chunk))
-                {
-                    return chunk.GetBlock(localPosition);
-                }
-            }
-
-            return -1;
+            var chunck = GetChunck(layer, globalPosition);
+            return chunck?.GetBlock(globalPosition) ?? 88888888;
         }
 
         
@@ -318,6 +325,41 @@ namespace Architecture
                 return chunk;
             }
             return null;
+        }
+
+        public List<Chunk> GetAllChuncksByLayer(int layer)
+        {
+            return layers[layer].Select(kv => kv.Value).ToList();
+        }
+
+        public void HideLayer(int layer)
+        {
+            var chuncks = GetAllChuncksByLayer(layer);
+            foreach (var chunck in chuncks)
+            {
+                chunck.Hide();
+            }
+        }
+
+        public void SwitchLayer(int layer, LayerSwitchDir dir)
+        {
+            if (dir == LayerSwitchDir.Next)
+            {
+                HideLayer(layer - 1);
+
+                for (int i = 0; i < numLayers; i++)
+                {
+                    if (i == layer - 1)
+                        continue;
+
+                    var chuncks = GetAllChuncksByLayer(i);
+                    foreach (var chunck in chuncks)
+                    {
+                        var colorLayer = i - layer;
+                        chunck.ChangeColor(colorLayer);
+                    }
+                }
+            }
         }
 
         private Chunk GenerateChunk(int layer, Vector2Int chunkKey)
@@ -547,3 +589,8 @@ namespace Architecture
     }
 }
 
+
+public enum LayerSwitchDir
+{
+    Next, Prev
+}
