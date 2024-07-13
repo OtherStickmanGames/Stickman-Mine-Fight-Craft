@@ -207,4 +207,10 @@ public class EventsHolder
 
     //-----------------------------------------------------------------------
 
+    public class BtnShowPrevLayer : UnityEvent { }
+
+    public static BtnShowPrevLayer onShowPrevLayer = new();
+
+    //-----------------------------------------------------------------------
+
 }

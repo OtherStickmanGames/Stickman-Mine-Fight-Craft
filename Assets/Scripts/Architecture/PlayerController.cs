@@ -15,9 +15,15 @@ public class PlayerController : NetworkBehaviour
 
         EventsHolder.onBtnNextLayer.AddListener(LayerNext_Click);
         EventsHolder.onBtnPrevLayer.AddListener(LayerPrev_Click);
+        EventsHolder.onShowPrevLayer.AddListener(ShowPrevLayer_Clicked);
 
         EventsHolder.onPlayerLayerChanged?.Invoke(Layer);
 
+    }
+
+    private void ShowPrevLayer_Clicked()
+    {
+        WorldManager.Instance.ShowPrevLayer();
     }
 
     private void Update()

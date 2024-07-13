@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Architecture;
 
-//[RequireComponent(typeof(Grid))]
 [RequireComponent(typeof(Tilemap))]
 [RequireComponent(typeof(TilemapRenderer))]
 [RequireComponent(typeof(TilemapCollider2D))]
@@ -13,7 +12,7 @@ public class Chunk : MonoBehaviour
     [SerializeField] Tilemap tilemap;
     [SerializeField] private new TilemapCollider2D collider;
     [SerializeField] AnimationCurve layerDarkness;
-    
+
     public int[,] blocks;
 
     public Vector2Int Position { get; private set; }
@@ -21,7 +20,10 @@ public class Chunk : MonoBehaviour
     public Tilemap Tilemap => tilemap;
 
     Transform player;
+    LTDescr transparencyTween;
     Color layerColor;
+    Color transparencyColor;
+
 
     const int chunckSize = 16;
 
@@ -58,6 +60,20 @@ public class Chunk : MonoBehaviour
         player = NetworkManager.Singleton.LocalClient.PlayerObject.transform;
     }
 
+    internal void SetTransparency(float value)
+    {
+        CheckProcessedTransparencyTween();
+
+        var startTransparency = tilemap.color.a;
+
+        transparencyTween = LeanTween.value(gameObject, a =>
+        {
+            transparencyColor.a = a;
+            tilemap.color = transparencyColor;
+        }, startTransparency, value, 1f).setEaseInQuad().setOnComplete(() => transparencyTween = null);
+
+    }
+
     Vector2Int blockPosition;
     public void SetBlock(Vector2 globalPosition, int blockId)
     {
@@ -90,12 +106,14 @@ public class Chunk : MonoBehaviour
 
     public void Hide()
     {
-        LeanTween.value(gameObject, a => 
+        CheckProcessedTransparencyTween();
+
+        transparencyColor = tilemap.color;
+        transparencyTween = LeanTween.value(gameObject, a =>
         {
-            var c = tilemap.color;
-            c.a = a;
-            tilemap.color = c;
-        }, 1, 0, 1f).setEaseInQuad();
+            transparencyColor.a = a;
+            tilemap.color = transparencyColor;
+        }, 1, 0, 1f).setEaseInQuad().setOnComplete(() => transparencyTween = null);
     }
 
     public void SetBlock(Vector2Int blockPos, int blockId)
@@ -183,6 +201,19 @@ public class Chunk : MonoBehaviour
         if (dist > WorldManager.Instance.chunkSize * (WorldManager.Instance.viewDistance + 3))
         {
             gameObject.SetActive(false);
+        }
+    }
+
+    private void OnDisable()
+    {
+        CheckProcessedTransparencyTween();
+    }
+
+    void CheckProcessedTransparencyTween()
+    {
+        if (transparencyTween != null)
+        {
+            LeanTween.cancel(transparencyTween.uniqueId);
         }
     }
 }

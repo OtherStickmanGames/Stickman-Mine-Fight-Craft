@@ -1,3 +1,4 @@
+using System;
 using Architecture;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,6 +18,13 @@ public class BlockManager : NetworkBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void Start()
+    {
+        
+    }
+
+    
 
     // Method to handle block changes requested by the player
     public void RequestBlockChange(int layer, Vector2Int position, int blockID)

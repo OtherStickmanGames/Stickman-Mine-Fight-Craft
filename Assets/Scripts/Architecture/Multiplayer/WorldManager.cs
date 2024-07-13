@@ -15,9 +15,29 @@ namespace Architecture
         public int chunkSize = 16;
         public int viewDistance = 3;
         public int numLayers = 4;
+        public float transparensyLayerValue = 0.5f;
 
         private Dictionary<int, Dictionary<Vector2Int, Chunk>> layers = new Dictionary<int, Dictionary<Vector2Int, Chunk>>();
         private Dictionary<string, Vector3> playerPositions = new Dictionary<string, Vector3>();
+
+        bool prevLayerShowed;
+
+        public void ShowPrevLayer()
+        {
+            var layer = player.Controller.Layer - 1;
+            SetLayerTransparency(layer, transparensyLayerValue);
+            prevLayerShowed = true;
+        }
+
+        void SetLayerTransparency(int layer, float value)
+        {
+            var chuncks = GetAllChuncksByLayer(layer);
+            foreach (var chunck in chuncks)
+            {
+                chunck.SetTransparency(value);
+            }
+        }
+
         Player player;
         private string saveFilePath;
 
@@ -135,6 +155,11 @@ namespace Architecture
             {
                 var colorLayer = chunkLayer - playerLayer;
                 chunk.ChangeColor(colorLayer);
+            }
+
+            if (prevLayerShowed && chunkLayer == playerLayer - 1)
+            {
+                chunk.SetTransparency(transparensyLayerValue);
             }
         }
 
@@ -512,7 +537,7 @@ namespace Architecture
             }
         }
 
-        [System.Serializable]
+        [Serializable]
         private class Serialization<TKey, TValue>
         {
             public List<TKey> keys;

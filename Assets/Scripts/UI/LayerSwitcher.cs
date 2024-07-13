@@ -13,15 +13,24 @@ public class LayerSwitcher : MonoBehaviour
     [SerializeField] TMP_Text txtCurLayer;
     [SerializeField] Color notAvailableLayer;
     [SerializeField] Color normalColor;
+    [SerializeField] Button btnShowPrevLayer;
 
 
     public void Init()
     {
+        btnShowPrevLayer.gameObject.SetActive(false);
+        btnShowPrevLayer.onClick.AddListener(ShowPrevLayer_Clicked);
+
         btnNextLayer.onClick.AddListener(NextLayer_Clicked);
         btnPrevLayer.onClick.AddListener(PrevLayer_Clicked);
 
         EventsHolder.onPlayerLayerChanged.AddListener(PlayerLayer_Changed);
         EventsHolder.onAvailableSwitchLayer.AddListener(AvailableSwitchLayer_Invoked);
+    }
+
+    private void ShowPrevLayer_Clicked()
+    {
+        EventsHolder.onShowPrevLayer?.Invoke();
     }
 
     Color curColor;
@@ -46,6 +55,8 @@ public class LayerSwitcher : MonoBehaviour
         txtCurLayer.text = $"{value + 1}";
         btnPrevLayer.interactable = value != 0;
         btnNextLayer.interactable = value != WorldManager.Instance.numLayers - 1;
+
+        btnShowPrevLayer.gameObject.SetActive(value > 0);
     }
 
     private void PrevLayer_Clicked()
